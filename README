@@ -1,0 +1,6 @@
+face - fairly awful c-based esolang
+
+Sample code (prints "Hello, World!" with trailing newline):
+
+    .#Hello, World!
+    :#\!@m*@m&@9*5&+**&,c'!'!,ioow&!*o
