@@ -308,14 +308,14 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
 
             case '!':
                 // logical NOT
-                OP1(ARG1, !, ARG2);
                 ip += 3;
+                OP1(ARG1, !, ARG2);
                 break;
 
             case '"':
                 // shift pointer
-                PTR_ADD(ARG1, ARG1, DEREF_AS(int, ARG2) * TYPE_SIZE);
                 ip += 3;
+                PTR_ADD(ARG1, ARG1, DEREF_AS(int, ARG2) * TYPE_SIZE);
                 break;
 
             case '#':
@@ -329,36 +329,37 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
 
             case '%':
                 // modulo
-                OP2_INT(ARG1, ARG2, %, ARG3);
                 ip += 4;
+                OP2_INT(ARG1, ARG2, %, ARG3);
                 break;
 
             case '&':
                 // bitwise AND
-                OP2_INT(ARG1, ARG2, &, ARG3);
                 ip += 4;
+                OP2_INT(ARG1, ARG2, &, ARG3);
                 break;
 
             case '\'':
                 // increment pointer
-                PTR_ADD(ARG1, ARG1, TYPE_SIZE);
                 ip += 2;
+                PTR_ADD(ARG1, ARG1, TYPE_SIZE);
                 break;
 
             case '*':
                 // multiplication
-                OP2(ARG1, ARG2, *, ARG3);
                 ip += 4;
+                OP2(ARG1, ARG2, *, ARG3);
                 break;
 
             case '+':
                 // addition
-                OP2(ARG1, ARG2, +, ARG3);
                 ip += 4;
+                OP2(ARG1, ARG2, +, ARG3);
                 break;
 
             case ',':
                 // change num mode / signedness
+                ip += 2;
                 switch (data[ip+1]) {
                     case 'c': nummode = CHAR; numsigned = 0; break;
                     case 'C': nummode = CHAR; numsigned = 1; break;
@@ -377,13 +378,12 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
                     case 'e': nummode = LDOUBLE; numsigned = 0; break;
                     case 'E': nummode = LDOUBLE; numsigned = 1; break;
                 }
-                ip += 2;
                 break;
 
             case '-':
                 // subtraction
-                OP2(ARG1, ARG2, -, ARG3);
                 ip += 4;
+                OP2(ARG1, ARG2, -, ARG3);
                 break;
 
             case '.':
@@ -393,8 +393,8 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
 
             case '/':
                 // division
-                OP2(ARG1, ARG2, /, ARG3);
                 ip += 4;
+                OP2(ARG1, ARG2, /, ARG3);
                 break;
 
             case '0':
@@ -407,8 +407,8 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
             case '7':
             case '8':
             case '9':
-                ASSIGN(ARG1, data[ip] - '0');
                 ip += 2;
+                ASSIGN(ARG1, data[ip] - '0');
                 break;
 
             case ':':
@@ -418,20 +418,20 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
 
             case '<':
                 // less than
-                OP2(ARG1, ARG2, <, ARG3);
                 ip += 4;
+                OP2(ARG1, ARG2, <, ARG3);
                 break;
 
             case '=':
                 // equal to
-                OP2(ARG1, ARG2, ==, ARG3);
                 ip += 4;
+                OP2(ARG1, ARG2, ==, ARG3);
                 break;
 
             case '>':
                 // greater than
-                OP2(ARG1, ARG2, >, ARG3);
                 ip += 4;
+                OP2(ARG1, ARG2, >, ARG3);
                 break;
 
             case '?':
@@ -451,94 +451,97 @@ jump:
 
             case '@':
                 // assign pointer
+                ip += 3;
                 if (!dups(vars_orig, data, &ip, OARG1)) free(OARG1);
                 OARG1 = OARG2;
                 ARG1 = ARG2;
                 break;
 
             case '\\':
+                // assign pointers to source code and instruction pointer
+                ip += 3;
                 if (!dups(vars_orig, data, &ip, OARG1)) free(OARG1);
                 if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
                 ARG1 = OARG1 = data;
                 ARG2 = OARG2 = &ip;
-                ip += 3;
                 break;
 
             case '^':
                 // bitwise XOR
-                OP2_INT(ARG1, ARG2, ^, ARG3);
                 ip += 4;
+                OP2_INT(ARG1, ARG2, ^, ARG3);
                 break;
 
             case '_':
                 // "rewind" / reset to original
-                ARG1 = OARG1;
                 ip += 2;
+                ARG1 = OARG1;
                 break;
 
             case '`':
                 // decrement pointer
-                PTR_ADD(ARG1, ARG1, -TYPE_SIZE);
                 ip += 2;
+                PTR_ADD(ARG1, ARG1, -TYPE_SIZE);
+                break;
 
             case 'c':
                 // calloc
+                ip += 3;
                 if (!dups(vars_orig, data, &ip, OARG1)) free(OARG1);
                 ARG1 = OARG1 = calloc(DEREF_AS(size_t, ARG2), TYPE_SIZE);
-                ip += 3;
                 break;
 
             case 'e':
                 // get stderr handle
-                ARG1 = OARG1 = stderr;
                 ip += 2;
+                ARG1 = OARG1 = stderr;
                 break;
 
             case 'i':
                 // get stdin handle
-                ARG1 = OARG1 = stdin;
                 ip += 2;
+                ARG1 = OARG1 = stdin;
                 break;
 
             case 'm':
                 // malloc/realloc
+                ip += 3;
                 if (dups(vars_orig, data, &ip, OARG1)) {
                     OARG1 = malloc(DEREF_AS(size_t, ARG2) * TYPE_SIZE);
                 } else {
                     OARG1 = realloc(OARG1, DEREF_AS(size_t, ARG2) * TYPE_SIZE);
                 }
                 ARG1 = OARG1;
-                ip += 3;
                 break;
 
             case 'o':
                 // get stdout handle
-                ARG1 = OARG1 = stdout;
                 ip += 2;
+                ARG1 = OARG1 = stdout;
                 break;
 
             case 'r':
                 // read
-                ASSIGN(ARG1, fread(ARG2, 1, DEREF_AS(size_t, ARG3), ARG4));
                 ip += 5;
+                ASSIGN(ARG1, fread(ARG2, 1, DEREF_AS(size_t, ARG3), ARG4));
                 break;
 
             case 'w':
                 // write
-                ASSIGN(ARG1, fwrite(ARG2, 1, DEREF_AS(size_t, ARG3), ARG4));
                 ip += 5;
+                ASSIGN(ARG1, fwrite(ARG2, 1, DEREF_AS(size_t, ARG3), ARG4));
                 break;
 
             case '|':
                 // bitwise OR
-                OP2_INT(ARG1, ARG2, |, ARG3);
                 ip += 4;
+                OP2_INT(ARG1, ARG2, |, ARG3);
                 break;
 
             case '~':
                 // bitwise NOT
-                OP1_INT(ARG1, ~, ARG2);
                 ip += 3;
+                OP1_INT(ARG1, ~, ARG2);
                 break;
 
             default:
