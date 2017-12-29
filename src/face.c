@@ -16,9 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
 #include "face.h"
 
@@ -275,7 +274,7 @@ enum nummode {
  * are there duplicate pointers to ptr in vars_orig? this is used to determine
  * whether to free stuff
  */
-int dups(void **vars_orig, char *data, int *ip, void *ptr) {
+int dups(void **vars_orig, char *data, size_t *ip, void *ptr) {
     if (ptr == data || ptr == ip) return 1;
     int found = 0;
     for (int i = 0; i < NVARS; ++i) {
@@ -293,7 +292,7 @@ int dups(void **vars_orig, char *data, int *ip, void *ptr) {
  */
 void face_run(char *data, size_t data_len, int argc, char **argv) {
     // instruction pointer - where we are inside of data
-    int ip = 0;
+    size_t ip = 0;
 
     // variables - correspond to ASCII chars
     void* vars[NVARS] = { NULL };
@@ -306,246 +305,246 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
     while (ip < data_len) {
         switch (data[ip]) {
 
-            case '!':
-                // logical NOT
-                ip += 3;
-                OP1(ARG2, !, ARG1);
-                break;
+        case '!':
+            // logical NOT
+            ip += 3;
+            OP1(ARG2, !, ARG1);
+            break;
 
-            case '"':
-                // shift pointer
-                ip += 3;
-                PTR_ADD(ARG2, ARG2, DEREF_AS(int, ARG1) * TYPE_SIZE);
-                break;
+        case '"':
+            // shift pointer
+            ip += 3;
+            PTR_ADD(ARG2, ARG2, DEREF_AS(int, ARG1) * TYPE_SIZE);
+            break;
 
-            case '#':
-                // comment
-                while (data[ip] != ';' && ip < data_len) ++ip;
-                break;
+        case '#':
+            // comment
+            while (data[ip] != ';' && ip < data_len) ++ip;
+            break;
 
-            case '$':
-                // exit / quit
-                return;
+        case '$':
+            // exit / quit
+            return;
 
-            case '%':
-                // modulo
-                ip += 4;
-                OP2_INT(ARG3, ARG2, %, ARG1);
-                break;
+        case '%':
+            // modulo
+            ip += 4;
+            OP2_INT(ARG3, ARG2, %, ARG1);
+            break;
 
-            case '&':
-                // bitwise AND
-                ip += 4;
-                OP2_INT(ARG3, ARG2, &, ARG1);
-                break;
+        case '&':
+            // bitwise AND
+            ip += 4;
+            OP2_INT(ARG3, ARG2, &, ARG1);
+            break;
 
-            case '\'':
-                // increment pointer
+        case '\'':
+            // increment pointer
+            ip += 2;
+            PTR_ADD(ARG1, ARG1, TYPE_SIZE);
+            break;
+
+        case '*':
+            // multiplication
+            ip += 4;
+            OP2(ARG3, ARG2, *, ARG1);
+            break;
+
+        case '+':
+            // addition
+            ip += 4;
+            OP2(ARG3, ARG2, +, ARG1);
+            break;
+
+        case ',':
+            // change num mode / signedness
+            ip += 2;
+            switch (data[ip-1]) {
+                case 'c': nummode = CHAR; numsigned = 0; break;
+                case 'C': nummode = CHAR; numsigned = 1; break;
+                case 's': nummode = SHORT; numsigned = 0; break;
+                case 'S': nummode = SHORT; numsigned = 1; break;
+                case 'i': nummode = INT; numsigned = 0; break;
+                case 'I': nummode = INT; numsigned = 1; break;
+                case 'l': nummode = LONG; numsigned = 0; break;
+                case 'L': nummode = LONG; numsigned = 1; break;
+                case 'm': nummode = LLONG; numsigned = 0; break;
+                case 'M': nummode = LLONG; numsigned = 1; break;
+                case 'f': nummode = FLOAT; numsigned = 0; break;
+                case 'F': nummode = FLOAT; numsigned = 1; break;
+                case 'd': nummode = DOUBLE; numsigned = 0; break;
+                case 'D': nummode = DOUBLE; numsigned = 1; break;
+                case 'e': nummode = LDOUBLE; numsigned = 0; break;
+                case 'E': nummode = LDOUBLE; numsigned = 1; break;
+            }
+            break;
+
+        case '-':
+            // subtraction
+            ip += 4;
+            OP2(ARG3, ARG2, -, ARG1);
+            break;
+
+        case '.':
+            // unconditional jump
+            ++ip;
+            goto jump;
+
+        case '/':
+            // division
+            ip += 4;
+            OP2(ARG3, ARG2, /, ARG1);
+            break;
+
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            ip += 2;
+            ASSIGN(ARG1, data[ip-2] - '0');
+            break;
+
+        case ':':
+            // label, skip the name
+            ip += 2;
+            break;
+
+        case '<':
+            // less than
+            ip += 4;
+            OP2(ARG3, ARG2, <, ARG1);
+            break;
+
+        case '=':
+            // equal to
+            ip += 4;
+            OP2(ARG3, ARG2, ==, ARG1);
+            break;
+
+        case '>':
+            // greater than
+            ip += 4;
+            OP2(ARG3, ARG2, >, ARG1);
+            break;
+
+        case '?':
+            // conditional jump
+            if (TF(ARG2)) {
                 ip += 2;
-                PTR_ADD(ARG1, ARG1, TYPE_SIZE);
-                break;
-
-            case '*':
-                // multiplication
-                ip += 4;
-                OP2(ARG3, ARG2, *, ARG1);
-                break;
-
-            case '+':
-                // addition
-                ip += 4;
-                OP2(ARG3, ARG2, +, ARG1);
-                break;
-
-            case ',':
-                // change num mode / signedness
-                ip += 2;
-                switch (data[ip-1]) {
-                    case 'c': nummode = CHAR; numsigned = 0; break;
-                    case 'C': nummode = CHAR; numsigned = 1; break;
-                    case 's': nummode = SHORT; numsigned = 0; break;
-                    case 'S': nummode = SHORT; numsigned = 1; break;
-                    case 'i': nummode = INT; numsigned = 0; break;
-                    case 'I': nummode = INT; numsigned = 1; break;
-                    case 'l': nummode = LONG; numsigned = 0; break;
-                    case 'L': nummode = LONG; numsigned = 1; break;
-                    case 'm': nummode = LLONG; numsigned = 0; break;
-                    case 'M': nummode = LLONG; numsigned = 1; break;
-                    case 'f': nummode = FLOAT; numsigned = 0; break;
-                    case 'F': nummode = FLOAT; numsigned = 1; break;
-                    case 'd': nummode = DOUBLE; numsigned = 0; break;
-                    case 'D': nummode = DOUBLE; numsigned = 1; break;
-                    case 'e': nummode = LDOUBLE; numsigned = 0; break;
-                    case 'E': nummode = LDOUBLE; numsigned = 1; break;
-                }
-                break;
-
-            case '-':
-                // subtraction
-                ip += 4;
-                OP2(ARG3, ARG2, -, ARG1);
-                break;
-
-            case '.':
-                // unconditional jump
-                ++ip;
-                goto jump;
-
-            case '/':
-                // division
-                ip += 4;
-                OP2(ARG3, ARG2, /, ARG1);
-                break;
-
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                ip += 2;
-                ASSIGN(ARG1, data[ip-2] - '0');
-                break;
-
-            case ':':
-                // label, skip the name
-                ip += 2;
-                break;
-
-            case '<':
-                // less than
-                ip += 4;
-                OP2(ARG3, ARG2, <, ARG1);
-                break;
-
-            case '=':
-                // equal to
-                ip += 4;
-                OP2(ARG3, ARG2, ==, ARG1);
-                break;
-
-            case '>':
-                // greater than
-                ip += 4;
-                OP2(ARG3, ARG2, >, ARG1);
-                break;
-
-            case '?':
-                // conditional jump
-                if (TF(ARG2)) {
-                    ip += 2;
 jump:
-                    for (char lbl = data[ip++];;) {
-                        if (data[ip] == ':' && data[ip+1] == lbl) break;
-                        ++ip;
-                        if (ip == data_len) ip = 0;
-                    }
-                } else {
-                    ip += 3;
+                for (char lbl = data[ip++];;) {
+                    if (data[ip] == ':' && data[ip+1] == lbl) break;
+                    ++ip;
+                    if (ip == data_len) ip = 0;
                 }
-                break;
-
-            case '@':
-                // assign pointer
+            } else {
                 ip += 3;
-                if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
-                OARG2 = OARG1;
-                ARG2 = ARG1;
-                break;
+            }
+            break;
 
-            case '\\':
-                // assign pointers to source code and instruction pointer
-                ip += 3;
-                if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
-                if (!dups(vars_orig, data, &ip, OARG1)) free(OARG1);
-                ARG2 = OARG2 = data;
-                ARG1 = OARG1 = &ip;
-                break;
+        case '@':
+            // assign pointer
+            ip += 3;
+            if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
+            OARG2 = OARG1;
+            ARG2 = ARG1;
+            break;
 
-            case '^':
-                // bitwise XOR
-                ip += 4;
-                OP2_INT(ARG3, ARG2, ^, ARG1);
-                break;
+        case '\\':
+            // assign pointers to source code and instruction pointer
+            ip += 3;
+            if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
+            if (!dups(vars_orig, data, &ip, OARG1)) free(OARG1);
+            ARG2 = OARG2 = data;
+            ARG1 = OARG1 = &ip;
+            break;
 
-            case '_':
-                // "rewind" / reset to original
-                ip += 2;
-                ARG1 = OARG1;
-                break;
+        case '^':
+            // bitwise XOR
+            ip += 4;
+            OP2_INT(ARG3, ARG2, ^, ARG1);
+            break;
 
-            case '`':
-                // decrement pointer
-                ip += 2;
-                PTR_ADD(ARG1, ARG1, -TYPE_SIZE);
-                break;
+        case '_':
+            // "rewind" / reset to original
+            ip += 2;
+            ARG1 = OARG1;
+            break;
 
-            case 'c':
-                // calloc
-                ip += 3;
-                if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
-                ARG2 = OARG2 = calloc(DEREF_AS(size_t, ARG1), TYPE_SIZE);
-                break;
+        case '`':
+            // decrement pointer
+            ip += 2;
+            PTR_ADD(ARG1, ARG1, -TYPE_SIZE);
+            break;
 
-            case 'e':
-                // get stderr handle
-                ip += 2;
-                ARG1 = OARG1 = stderr;
-                break;
+        case 'c':
+            // calloc
+            ip += 3;
+            if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
+            ARG2 = OARG2 = calloc(DEREF_AS(size_t, ARG1), TYPE_SIZE);
+            break;
 
-            case 'i':
-                // get stdin handle
-                ip += 2;
-                ARG1 = OARG1 = stdin;
-                break;
+        case 'e':
+            // get stderr handle
+            ip += 2;
+            ARG1 = OARG1 = stderr;
+            break;
 
-            case 'm':
-                // malloc/realloc
-                ip += 3;
-                if (dups(vars_orig, data, &ip, OARG2)) {
-                    OARG2 = malloc(DEREF_AS(size_t, ARG1) * TYPE_SIZE);
-                } else {
-                    OARG2 = realloc(OARG2, DEREF_AS(size_t, ARG1) * TYPE_SIZE);
-                }
-                ARG2 = OARG2;
-                break;
+        case 'i':
+            // get stdin handle
+            ip += 2;
+            ARG1 = OARG1 = stdin;
+            break;
 
-            case 'o':
-                // get stdout handle
-                ip += 2;
-                ARG1 = OARG1 = stdout;
-                break;
+        case 'm':
+            // malloc/realloc
+            ip += 3;
+            if (dups(vars_orig, data, &ip, OARG2)) {
+                OARG2 = malloc(DEREF_AS(size_t, ARG1) * TYPE_SIZE);
+            } else {
+                OARG2 = realloc(OARG2, DEREF_AS(size_t, ARG1) * TYPE_SIZE);
+            }
+            ARG2 = OARG2;
+            break;
 
-            case 'r':
-                // read
-                ip += 5;
-                ASSIGN(ARG4, fread(ARG3, 1, DEREF_AS(size_t, ARG2), ARG1));
-                break;
+        case 'o':
+            // get stdout handle
+            ip += 2;
+            ARG1 = OARG1 = stdout;
+            break;
 
-            case 'w':
-                // write
-                ip += 5;
-                ASSIGN(ARG4, fwrite(ARG3, 1, DEREF_AS(size_t, ARG2), ARG1));
-                break;
+        case 'r':
+            // read
+            ip += 5;
+            ASSIGN(ARG4, fread(ARG3, 1, DEREF_AS(size_t, ARG2), ARG1));
+            break;
 
-            case '|':
-                // bitwise OR
-                ip += 4;
-                OP2_INT(ARG3, ARG2, |, ARG1);
-                break;
+        case 'w':
+            // write
+            ip += 5;
+            ASSIGN(ARG4, fwrite(ARG3, 1, DEREF_AS(size_t, ARG2), ARG1));
+            break;
 
-            case '~':
-                // bitwise NOT
-                ip += 3;
-                OP1_INT(ARG2, ~, ARG1);
-                break;
+        case '|':
+            // bitwise OR
+            ip += 4;
+            OP2_INT(ARG3, ARG2, |, ARG1);
+            break;
 
-            default:
-                ++ip;
+        case '~':
+            // bitwise NOT
+            ip += 3;
+            OP1_INT(ARG2, ~, ARG1);
+            break;
+
+        default:
+            ++ip;
 
         }
     }
