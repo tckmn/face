@@ -1,0 +1,90 @@
+face stands for "fairly awful c-based esolang".  In the true style of C,
+everything is a pointer and you have to allocate your own memory.
+
+Code is parsed linearly, and each function has fixed arity.  When a function is
+encountered, the next n bytes are treated as variables (variable names can be
+any printable ASCII) and passed to the function.
+
+The unary operators !~ and binary operators +-*/%&|^<> are supported, and they
+do the same thing they do in C.  In addition, = corresponds to C's ==.  They
+take one more argument than they traditionally do in C; for example, +abc
+roughly corresponds to
+  *a = *b + *c
+in C, and similarly !de is used for
+  *d = !*e
+
+At every point in a face program, a global "number mode" exists that dictates
+how variables are dereferenced.  This defaults to signed integer (the int type
+in C).  In this mode, +abc is really interpreted as
+  *(int*)a = *(int*)b + *(int*)c
+as internally all variables are stored as void*.  However, if the number mode
+is set to, say, unsigned long, then the same face code +abc is interpreted as
+  *(unsigned long*)a = *(unsigned long*)b + *(unsigned long*)c
+The number mode can be changed with the , command followed by a letter, which
+can be one of the following:
+  c  char
+  s  short
+  i  int
+  l  long
+  m  long long
+  f  float
+  d  double
+  e  long double
+Lowercase letters are used for signed types, and uppercase for unsigned.  (Both
+work for floats and doubles, but there is no functional difference.)
+
+Flow control in face is done entirely via jumps.  Labels are indicated with :x
+where x can be any ASCII character, and jumps can be unconditional or
+conditional.  An unconditional jump (corresponds to goto in C) is done with .x
+and a conditional jump with ?cx (c is the condition, and the jump will be
+executed iff its dereferenced value is not zero).
+
+face supports a primitive form of self-modification or introspection.  The \
+command takes two arguments and assigns a pointer to the beginning of the
+source code to the first and a pointer to the instruction pointer to the
+second.  The instruction pointer is, in fact, not a pointer, but simply an
+integer representing the index in the source code of the command being
+evaluated.  \ can be used to access strings stored in the source code, which
+can be skipped by either jumps or by modifying the instruction pointer.
+
+Amusingly, the \ command is effectively required for any nontrivial program!
+This is true because malloc and calloc require an argument specifying how much
+memory to allocate, but all arguments are passed as pointers in face, running
+into a sort of circular logic.  However, one can use the values of the pointers
+returned from the \ command as arguments to malloc to circumvent this issue.
+
+The only proper "assignment" operators (aside from pointer assignment) are the
+digits 0 through 9.  These act as unary functions that take a pointer as an
+argument; for example, 6a corresponds to the C code *a = 6.  Pointer assignment
+is binary and uses the @ operator; e.g. @ab assigns the pointer value of b to a
+(a = b in C, where a and b are pointers).
+
+There are also four other pointer manipulation commands.  The ' command
+increments a pointer ('a is a++) and the ` command decrements a pointer (`a is
+a--).  The " command shifts a pointer by a given amount ("ab is a += *b); note
+that the second argument is always dereferenced as a signed integer regardless
+of number mode!  Finally, the unary _ command "rewinds" or resets a pointer to
+its original value; that is, the value it had before any '`" operations were
+performed on it.
+
+Comments are expressed with the notation # ... ; -- that is, when a # symbol is
+encountered in parsing, everything until the following ; is ignored.
+Additionally, if a $ is encountered while parsing, the program is immediately
+terminated.
+
+Lowercase letters represent standard library functions.  The following are
+currently available:
+
+  c   a = calloc(*(size_t*)b, sizeof nummode)
+  e   a = stderr
+  i   a = stdin
+  m   a = malloc(*(size_t*)b * sizeof nummode)
+  o   a = stdout
+  r   a = fread(b, 1, *(size_t*)c, d)
+  w   a = fwrite(b, 1, *(size_t*)c, d)
+
+As a special case, the m function will call realloc if its first argument is
+the last reference to a given pointer (and c will call free in the same case),
+thus eliminating the need to manually free memory.  The commands @ and \ also
+have this auto-freeing behavior.  (Consider this the one concession to
+usability that face provides.)
