@@ -29,10 +29,15 @@ int main(int argc, char **argv) {
     }
 
     // open and check input file
-    FILE *fp = fopen(argv[1], "r");
-    if (!fp) {
-        fprintf(stderr, "cannot open file %s for reading\n", argv[1]);
-        return 1;
+    FILE *fp;
+    if (argv[1][0] == '-' && !argv[1][1]) {
+        fp = stdin;
+    } else {
+        fp = fopen(argv[1], "r");
+        if (!fp) {
+            fprintf(stderr, "cannot open file %s for reading\n", argv[1]);
+            return 1;
+        }
     }
 
     // read file into memory
