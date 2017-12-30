@@ -1,4 +1,4 @@
-NAME = fake
+NAME = face
 TARGET = bin/$(NAME)
 MANPAGE = $(NAME).1
 PREFIX ?= /usr/local
