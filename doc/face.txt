@@ -53,10 +53,15 @@ memory to allocate, but all arguments are passed as pointers in face, running
 into a sort of circular logic.  However, one can use the values of the pointers
 returned from the \ command as arguments to malloc to circumvent this issue.
 
+To facilitate the use of \ to access embedded strings, all @ characters are
+replaced with null bytes in a preprocessing stage.  In order to allow the use
+of actual @ characters, the ; symbol acts as an escape character (so, ;@ is a
+literal @, and ;; is a literal ;).
+
 The only proper "assignment" operators (aside from pointer assignment) are the
 digits 0 through 9.  These act as unary functions that take a pointer as an
 argument; for example, 6a corresponds to the C code *a = 6.  Pointer assignment
-is binary and uses the @ operator; e.g. @ab assigns the pointer value of b to a
+is binary and uses the # operator; e.g. #ab assigns the pointer value of b to a
 (a = b in C, where a and b are pointers).
 
 There are also four other pointer manipulation commands.  The ' command
@@ -67,8 +72,8 @@ of number mode!  Finally, the unary _ command "rewinds" or resets a pointer to
 its original value; that is, the value it had before any '`" operations were
 performed on it.
 
-Comments are expressed with the notation # ... ; -- that is, when a # symbol is
-encountered in parsing, everything until the following ; is ignored.
+Comments are expressed with the notation ( ... ) -- that is, when a ( symbol is
+encountered in parsing, everything until the following ) is ignored.
 Additionally, if a $ is encountered while parsing, the program is immediately
 terminated.
 

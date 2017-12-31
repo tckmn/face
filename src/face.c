@@ -288,11 +288,23 @@ int dups(void **vars_orig, char *data, size_t *ip, void *ptr) {
     return 0;
 }
 
+size_t preprocess(char *data, size_t data_len) {
+    size_t i, j;
+    for (i = 0, j = 0; i < data_len; ++i, ++j) {
+        if (data[i] == '@')      data[j] = '\0';
+        else if (data[i] == ';') data[j] = data[++i];
+        else                     data[j] = data[i];
+    }
+    return j;
+}
+
 /*
  * the main entry point for outside callers - runs data as face code with the
  * given arguments
  */
 void face_run(char *data, size_t data_len, int argc, char **argv) {
+    data_len = preprocess(data, data_len);
+
     // instruction pointer - where we are inside of data
     size_t ip = 0;
 
@@ -320,8 +332,11 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
             break;
 
         case '#':
-            // comment
-            while (data[ip] != ';' && ip < data_len) ++ip;
+            // assign pointer
+            ip += 3;
+            if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
+            OARG2 = OARG1;
+            ARG2 = ARG1;
             break;
 
         case '$':
@@ -344,6 +359,11 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
             // increment pointer
             ip += 2;
             PTR_ADD(ARG1, ARG1, TYPE_SIZE);
+            break;
+
+        case '(':
+            // comment
+            while (data[ip] != ')' && ip < data_len) ++ip;
             break;
 
         case '*':
