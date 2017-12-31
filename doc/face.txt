@@ -80,16 +80,28 @@ terminated.
 Lowercase letters represent standard library functions.  The following are
 currently available:
 
-  c   a = calloc(*(size_t*)b, sizeof nummode)
+  c   a = calloc((size_t)*b, sizeof nummode)
   e   a = stderr
   i   a = stdin
-  m   a = malloc(*(size_t*)b * sizeof nummode)
+  m   a = malloc((size_t)*b * sizeof nummode)
   o   a = stdout
-  r   a = fread(b, 1, *(size_t*)c, d)
-  w   a = fwrite(b, 1, *(size_t*)c, d)
+  p   *a = sprintf(b, c, ...)
+  r   *a = fread(b, 1, (size_t)*c, d)
+  s   *a = sscanf(b, c, ...)
+  w   *a = fwrite(b, 1, (size_t)*c, d)
 
 As a special case, the m function will call realloc if its first argument is
 the last reference to a given pointer (and c will call free in the same case),
-thus eliminating the need to manually free memory.  The commands @ and \ also
-have this auto-freeing behavior.  (Consider this the one concession to
+thus eliminating the need to manually free memory.  The commands @, \, and p
+also have this auto-freeing behavior.  (Consider this the one concession to
 usability that face provides.)
+
+Variadic functions are called by specifying a type (cCsSiIlLmMfFdDeE) followed
+by a variable name any number of times.  The argument list is terminated when
+the following character is not part of this set. For example,
+  n = sprintf(s, "%d %f\n", x, y)
+would roughly translate to pns%ixdy, assuming the format string is stored in %.
+
+Also note that the p/sprintf function has special behavior that automatically
+allocates the right amount of memory for the string being printed into, making
+it somewhat like the nonstandard GNU asprintf().
