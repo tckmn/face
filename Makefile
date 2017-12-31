@@ -2,7 +2,7 @@ NAME = face
 TARGET = bin/$(NAME)
 MANPAGE = $(NAME).1
 PREFIX ?= /usr/local
-LIBS = -lm
+LIBS = -lm -I/usr/lib/libffi-3.2.1/include -lffi
 .PHONY: all debug release install clean
 
 all: $(TARGET)

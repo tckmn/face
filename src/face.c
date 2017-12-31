@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <ffi.h>
+
 #include "face.h"
 
 #define NVARS 128
@@ -519,11 +521,101 @@ jump:
             ARG1 = OARG1 = stdout;
             break;
 
+        case 'p': {
+            // sprintf - acts kinda like asprintf
+            ip += 4;
+            ffi_cif cif;
+            int count = 0, i;
+            char d;
+            for (i = ip; d = data[i] | 0x20,
+                d == 'c' || d == 's' || d == 'i' || d == 'l' ||
+                d == 'm' || d == 'f' || d == 'd' || d == 'e'; i += 2, ++count);
+            ffi_type **atypes = malloc((3 + count) * sizeof *atypes);
+            void **avalues = malloc((3 + count) * sizeof *avalues);
+            void *np = 0;
+            unsigned long size = 0;
+            atypes[0] = &ffi_type_pointer;
+            avalues[0] = &np;
+            atypes[1] = &ffi_type_ulong; // this should really be size_t
+            avalues[1] = &size;
+            atypes[2] = &ffi_type_pointer;
+            avalues[2] = &ARG1;
+            for (int n = 0; n < count; ++n) {
+                switch (data[ip + n*2]) {
+                case 'c': atypes[n+3] = &ffi_type_schar;      break;
+                case 'C': atypes[n+3] = &ffi_type_uchar;      break;
+                case 's': atypes[n+3] = &ffi_type_sshort;     break;
+                case 'S': atypes[n+3] = &ffi_type_ushort;     break;
+                case 'i': atypes[n+3] = &ffi_type_sint;       break;
+                case 'I': atypes[n+3] = &ffi_type_uint;       break;
+                case 'l': atypes[n+3] = &ffi_type_slong;      break;
+                case 'L': atypes[n+3] = &ffi_type_ulong;      break;
+                case 'm': atypes[n+3] = &ffi_type_sint64;     break; // this is bad
+                case 'M': atypes[n+3] = &ffi_type_uint64;     break;
+                case 'f':
+                case 'F': atypes[n+3] = &ffi_type_float;      break;
+                case 'd':
+                case 'D': atypes[n+3] = &ffi_type_double;     break;
+                case 'e':
+                case 'E': atypes[n+3] = &ffi_type_longdouble; break;
+                }
+                avalues[n+3] = vars[(int)data[ip + n*2 + 1]];
+            }
+            // call snprintf for the first time, to figure out how much space
+            // we're gonna need to allocate
+            ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 3, 3 + count,
+                    &ffi_type_sint, atypes);
+            ffi_arg res;
+            ffi_call(&cif, snprintf, &res, avalues);
+            size = ((int)res) + 1;
+            // basically copy/paste of malloc command
+            if (dups(vars_orig, data, &ip, OARG2)) {
+                OARG2 = malloc(size * TYPE_SIZE);
+            } else {
+                OARG2 = realloc(OARG2, size * TYPE_SIZE);
+            }
+            ARG2 = OARG2;
+            // call snprintf for the second time
+            avalues[0] = &ARG2;
+            ip = i;
+            ffi_call(&cif, snprintf, &res, avalues);
+            ASSIGN(ARG(-3 - count*2), (int)res);
+            break;
+        }
+
         case 'r':
             // read
             ip += 5;
             ASSIGN(ARG4, fread(ARG3, 1, DEREF_AS(size_t, ARG2), ARG1));
             break;
+
+        case 's': {
+            // sscanf
+            ip += 4;
+            ffi_cif cif;
+            int count = 0, i;
+            char d;
+            for (i = ip; d = data[i] | 0x20,
+                d == 'c' || d == 's' || d == 'i' || d == 'l' ||
+                d == 'm' || d == 'f' || d == 'd' || d == 'e'; i += 2, ++count);
+            ffi_type **atypes = malloc((2 + count) * sizeof *atypes);
+            void **avalues = malloc((2 + count) * sizeof *avalues);
+            atypes[0] = &ffi_type_pointer;
+            avalues[0] = &ARG2;
+            atypes[1] = &ffi_type_pointer;
+            avalues[1] = &ARG1;
+            for (int n = 0; n < count; ++n) {
+                atypes[n+2] = &ffi_type_pointer;
+                avalues[n+2] = &ARG(n*2 + 1);
+            }
+            ip = i;
+            ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 2, 2 + count,
+                    &ffi_type_sint, atypes);
+            ffi_arg res;
+            ffi_call(&cif, sscanf, &res, avalues);
+            ASSIGN(ARG(-3 - count*2), (int)res);
+            break;
+        }
 
         case 'w':
             // write
