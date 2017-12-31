@@ -470,14 +470,6 @@ jump:
             }
             break;
 
-        case '@':
-            // assign pointer
-            ip += 3;
-            if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
-            OARG2 = OARG1;
-            ARG2 = ARG1;
-            break;
-
         case '\\':
             // assign pointers to source code and instruction pointer
             ip += 3;
