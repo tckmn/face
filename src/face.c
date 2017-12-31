@@ -292,7 +292,7 @@ size_t preprocess(char *data, size_t data_len) {
     size_t i, j;
     for (i = 0, j = 0; i < data_len; ++i, ++j) {
         if (data[i] == '@')      data[j] = '\0';
-        else if (data[i] == ';') data[j] = data[++i];
+        else if (data[i] == '#') data[j] = data[++i];
         else                     data[j] = data[i];
     }
     return j;
@@ -331,17 +331,13 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
             PTR_ADD(ARG2, ARG2, DEREF_AS(int, ARG1) * TYPE_SIZE);
             break;
 
-        case '#':
+        case '$':
             // assign pointer
             ip += 3;
             if (!dups(vars_orig, data, &ip, OARG2)) free(OARG2);
             OARG2 = OARG1;
             ARG2 = ARG1;
             break;
-
-        case '$':
-            // exit / quit
-            return;
 
         case '%':
             // modulo
@@ -435,6 +431,29 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
         case ':':
             // label, skip the name
             ip += 2;
+            break;
+
+        case ';':
+            // type conversion
+            ip += 3;
+            switch (data[ip-2]) {
+                case 'c': *(unsigned char*)     ARG1 = DEREF_AS(unsigned char,      ARG1); break;
+                case 'C': *(signed char*)       ARG1 = DEREF_AS(signed char,        ARG1); break;
+                case 's': *(unsigned short*)    ARG1 = DEREF_AS(unsigned short,     ARG1); break;
+                case 'S': *(signed short*)      ARG1 = DEREF_AS(signed short,       ARG1); break;
+                case 'i': *(unsigned int*)      ARG1 = DEREF_AS(unsigned int,       ARG1); break;
+                case 'I': *(signed int*)        ARG1 = DEREF_AS(signed int,         ARG1); break;
+                case 'l': *(unsigned long*)     ARG1 = DEREF_AS(unsigned long,      ARG1); break;
+                case 'L': *(signed long*)       ARG1 = DEREF_AS(signed long,        ARG1); break;
+                case 'm': *(unsigned long long*)ARG1 = DEREF_AS(unsigned long long, ARG1); break;
+                case 'M': *(signed long long*)  ARG1 = DEREF_AS(signed long long,   ARG1); break;
+                case 'f':
+                case 'F': *(float*)             ARG1 = DEREF_AS(float,              ARG1); break;
+                case 'd':
+                case 'D': *(double*)            ARG1 = DEREF_AS(double,             ARG1); break;
+                case 'e':
+                case 'E': *(long double*)       ARG1 = DEREF_AS(long double,        ARG1); break;
+            }
             break;
 
         case '<':
@@ -597,6 +616,10 @@ jump:
             ASSIGN(ARG(-3 - count*2), (int)res);
             break;
         }
+
+        case 'q':
+            // quit
+            return;
 
         case 'r':
             // read

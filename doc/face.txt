@@ -55,13 +55,13 @@ returned from the \ command as arguments to malloc to circumvent this issue.
 
 To facilitate the use of \ to access embedded strings, all @ characters are
 replaced with null bytes in a preprocessing stage.  In order to allow the use
-of actual @ characters, the ; symbol acts as an escape character (so, ;@ is a
-literal @, and ;; is a literal ;).
+of actual @ characters, the # symbol acts as an escape character (so, #@ is a
+literal @, and ## is a literal #).
 
 The only proper "assignment" operators (aside from pointer assignment) are the
 digits 0 through 9.  These act as unary functions that take a pointer as an
 argument; for example, 6a corresponds to the C code *a = 6.  Pointer assignment
-is binary and uses the # operator; e.g. #ab assigns the pointer value of b to a
+is binary and uses the $ operator; e.g. $ab assigns the pointer value of b to a
 (a = b in C, where a and b are pointers).
 
 There are also four other pointer manipulation commands.  The ' command
@@ -74,11 +74,11 @@ performed on it.
 
 Comments are expressed with the notation ( ... ) -- that is, when a ( symbol is
 encountered in parsing, everything until the following ) is ignored.
-Additionally, if a $ is encountered while parsing, the program is immediately
-terminated.
+Additionally, if a q is encountered as a command while parsing, the program is
+immediately terminated.
 
-Lowercase letters represent standard library functions.  The following are
-currently available:
+Lowercase letters typically represent standard library functions.  The
+following are currently available:
 
   c   a = calloc((size_t)*b, sizeof nummode)
   e   a = stderr
