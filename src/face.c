@@ -540,8 +540,8 @@ jump:
             int count = 0, i;
             char d;
             for (i = ip; d = data[i] | 0x20,
-                d == 'c' || d == 's' || d == 'i' || d == 'l' ||
-                d == 'm' || d == 'f' || d == 'd' || d == 'e'; i += 2, ++count);
+                d == 'c' || d == 's' || d == 'i' || d == 'l' || d == 'm' ||
+                d == 'f' || d == 'd' || d == 'e' || d == 'p'; i += 2, ++count);
             ffi_type **atypes = malloc((3 + count) * sizeof *atypes);
             void **avalues = malloc((3 + count) * sizeof *avalues);
             void *np = 0;
@@ -570,8 +570,11 @@ jump:
                 case 'D': atypes[n+3] = &ffi_type_double;     break;
                 case 'e':
                 case 'E': atypes[n+3] = &ffi_type_longdouble; break;
+                case 'p':
+                case 'P': atypes[n+3] = &ffi_type_pointer;    break;
                 }
-                avalues[n+3] = vars[(int)data[ip + n*2 + 1]];
+                avalues[n+3] = (data[ip + n*2] | 0x20) == 'p' ?
+                    &ARG(n*2 + 1) : ARG(n*2 + 1);
             }
             // call snprintf for the first time, to figure out how much space
             // we're gonna need to allocate
@@ -607,9 +610,7 @@ jump:
             ffi_cif cif;
             int count = 0, i;
             char d;
-            for (i = ip; d = data[i] | 0x20,
-                d == 'c' || d == 's' || d == 'i' || d == 'l' ||
-                d == 'm' || d == 'f' || d == 'd' || d == 'e'; i += 2, ++count);
+            for (i = ip; (data[i] | 0x20) == 'p'; i += 2, ++count);
             ffi_type **atypes = malloc((2 + count) * sizeof *atypes);
             void **avalues = malloc((2 + count) * sizeof *avalues);
             atypes[0] = &ffi_type_pointer;

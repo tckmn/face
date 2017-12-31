@@ -2,13 +2,14 @@ face - fairly awful c-based esolang
 
 Sample code (prints "Hello, World!" with trailing newline):
 
-    .#Hello, World!
-    :#\!@m*@m&@9*5&+**&,c'!'!,ioow&!*o
+    (Hello, World!
+    )\$*m#*7#+###,c'$,ioow#$#o
 
 The motivation for the creation of face was that I wanted an esolang that makes
 you allocate your own memory.  (The reasons for this desire should be
 self-evident.)
 
 For an introduction to face, see doc/face.txt.  To compile, simply run make.
+face depends on libffi.
 
 face is licensed under the GPL 3.0.

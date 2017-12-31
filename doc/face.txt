@@ -96,11 +96,11 @@ thus eliminating the need to manually free memory.  The commands @, \, and p
 also have this auto-freeing behavior.  (Consider this the one concession to
 usability that face provides.)
 
-Variadic functions are called by specifying a type (cCsSiIlLmMfFdDeE) followed
-by a variable name any number of times.  The argument list is terminated when
-the following character is not part of this set. For example,
-  n = sprintf(s, "%d %f\n", x, y)
-would roughly translate to pns%ixdy, assuming the format string is stored in %.
+Variadic functions are called by specifying a type (cCsSiIlLmMfFdDeEpP, where p
+is any pointer) followed by a variable name any number of times.  The argument
+list is terminated when the following character is not part of this set.  For
+example, n = sprintf(s, "%d %f\n", x, y) would roughly translate to pns%ixdy,
+assuming the format string is stored in %.
 
 Also note that the p/sprintf function has special behavior that automatically
 allocates the right amount of memory for the string being printed into, making
