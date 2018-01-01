@@ -12,4 +12,6 @@ self-evident.)
 For an introduction to face, see doc/face.txt.  To compile, simply run make.
 face depends on libffi.
 
+CI: https://travis-ci.org/KeyboardFire/face
+
 face is licensed under the GPL 3.0.
