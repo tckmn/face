@@ -672,7 +672,6 @@ jump:
             ip += 4;
             ffi_cif cif;
             int count = 0, i;
-            char d;
             for (i = ip; (data[i] | 0x20) == 'p'; i += 2, ++count);
             ffi_type **atypes = malloc((2 + count) * sizeof *atypes);
             void **avalues = malloc((2 + count) * sizeof *avalues);
