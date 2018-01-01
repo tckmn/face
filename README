@@ -3,7 +3,7 @@ face - fairly awful c-based esolang
 Sample code (prints "Hello, World!" with trailing newline):
 
     (Hello, World!
-    )\$*m#*7#+###,c'$,ioow#$#o
+    )\$*m%*7%+%%%,c'$,ioow%$%o
 
 The motivation for the creation of face was that I wanted an esolang that makes
 you allocate your own memory.  (The reasons for this desire should be
