@@ -2,18 +2,19 @@ NAME = face
 TARGET = bin/$(NAME)
 MANPAGE = $(NAME).1
 PREFIX ?= /usr/local
+CC ?= gcc
 LIBS = -lm -I/usr/lib/libffi-3.2.1/include -lffi
-.PHONY: all debug release install clean
+.PHONY: all debug release install clean test
 
 all: $(TARGET)
 
 bin/%.o: src/%.c $(wildcard src/*.h)
 	@mkdir -p bin
-	gcc $(FLAGS) -Wall -Wextra -Wpedantic $(LIBS) -c $< -o $@
+	$(CC) $(FLAGS) -Wall -Wextra -Wpedantic $(LIBS) -c $< -o $@
 
 $(TARGET): $(patsubst src/%.c, bin/%.o, $(wildcard src/*.c))
 	@mkdir -p bin
-	gcc $(FLAGS) -Wall -Wextra -Wpedantic $(LIBS) $^ -o $@
+	$(CC) $(FLAGS) -Wall -Wextra -Wpedantic $(LIBS) $^ -o $@
 
 debug: FLAGS = -g -O0
 
@@ -30,3 +31,6 @@ install: $(TARGET)
 
 clean:
 	rm -rf bin
+
+test: $(TARGET)
+	tests/test.sh
