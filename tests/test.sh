@@ -3,6 +3,7 @@
 out=
 lnum=0
 fail=0
+total=0
 
 while IFS= read -r line
 do
@@ -19,21 +20,16 @@ do
                 echo "test failure on line $lnum (expected $line, got ${out:1})"
                 fail=$((fail+1))
             fi
+            total=$((total+1))
             out=
         fi
     fi
 done <tests/data.txt
 
-echo -ne '\e[1m'
 if [ $fail -eq 0 ]
 then
-    echo -e '\e[32mall tests passed'
+    echo -e "\\e[1m\\e[32m$total tests passed\\e[m"
 else
-    s=s
-    if [ $fail -eq 1 ]; then s=; fi
-    echo -e "\\e[31m$fail test$s failed"
-    fail=1
+    echo -e "\\e[1m\\e[31m$fail/$total tests failed\\e[m"
+    exit 1
 fi
-echo -ne '\e[m'
-
-exit $fail
