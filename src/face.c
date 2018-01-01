@@ -16,8 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <ffi.h>
 
@@ -486,6 +488,44 @@ jump:
                 }
             } else {
                 ip += 3;
+            }
+            break;
+
+        case 'M':
+            switch (data[++ip]) {
+            case 'c':
+                ip += 3;
+                ASSIGN(ARG2, cos(DEREF_AS(double, ARG1)));
+                break;
+            case 'e':
+                ip += 3;
+                ASSIGN(ARG2, exp(DEREF_AS(double, ARG1)));
+                break;
+            case 'p':
+                ip += 4;
+                ASSIGN(ARG3, pow(DEREF_AS(double, ARG2), DEREF_AS(double, ARG1)));
+                break;
+            case 's':
+                ip += 3;
+                ASSIGN(ARG2, sin(DEREF_AS(double, ARG1)));
+                break;
+            case 't':
+                ip += 3;
+                ASSIGN(ARG2, tan(DEREF_AS(double, ARG1)));
+                break;
+            }
+            break;
+
+        case 'S':
+            switch (data[++ip]) {
+            case 'c':
+                ip += 4;
+                ASSIGN(ARG3, strcmp(ARG2, ARG1));
+                break;
+            case 'l':
+                ip += 3;
+                ASSIGN(ARG2, strlen(ARG1));
+                break;
             }
             break;
 

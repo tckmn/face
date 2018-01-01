@@ -105,3 +105,13 @@ assuming the format string is stored in %.
 Also note that the p/sprintf function has special behavior that automatically
 allocates the right amount of memory for the string being printed into, making
 it somewhat like the nonstandard GNU asprintf().
+
+Uppercase letters are typically collections of related functions:
+
+  Mc   *a = cos((double)*b)
+  Me   *a = exp((double)*b)
+  Mp   *a = pow((double)*b * (double)*c)
+  Ms   *a = sin((double)*b)
+  Mt   *a = tan((double)*b)
+  Sc   *a = strcmp(b, c)
+  Sl   *a = strlen(b)
