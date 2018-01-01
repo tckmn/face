@@ -10,3 +10,25 @@
         2
     (%d@)\$*,c'$ma*mb*mc*9a4b%cabpa=$cco>wb=a>
         1
+
+*** test bitwise operators ***
+
+    (%d@)\$*,c'$ma*mb*mc*6a5b&cabpa=$cco>wb=a>
+        4
+    (%d@)\$*,c'$ma*mb*mc*6a5b|cabpa=$cco>wb=a>
+        7
+    (%d@)\$*,c'$ma*mb*mc*6a5b^cabpa=$cco>wb=a>
+        3
+    (%d@)\$*,c'$ma*6a~aapa=$cao>wa=a>
+        -7
+
+*** test relational/boolean operators ***
+
+    (%d %d %d@)\$*,c'$ma*mb*m1*m2*m3*6a5b<1ab=2ab>3abpa=$c1c2c3o>wb=a>
+        0 0 1
+    (%d %d %d@)\$*,c'$ma*mb*m1*m2*m3*5a6b<1ab=2ab>3abpa=$c1c2c3o>wb=a>
+        1 0 0
+    (%d %d %d@)\$*,c'$ma*mb*m1*m2*m3*6a6b<1ab=2ab>3abpa=$c1c2c3o>wb=a>
+        0 1 0
+    (%d %d %d@)\$*,c'$m0*m1*m2*001122!00!11!22p0=$c0c1c2o>w0=0>
+        1 0 0
