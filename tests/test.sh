@@ -16,7 +16,7 @@ do
         else
             if [ "$out" != "x$line" ]
             then
-                echo "test failure on line $lnum"
+                echo "test failure on line $lnum (expected $line, got ${out:1})"
                 fail=$((fail+1))
             fi
             out=
