@@ -56,7 +56,9 @@ returned from the \ command as arguments to malloc to circumvent this issue.
 To facilitate the use of \ to access embedded strings, all @ characters are
 replaced with null bytes in a preprocessing stage.  In order to allow the use
 of actual @ characters, the # symbol acts as an escape character (so, #@ is a
-literal @, and ## is a literal #).
+literal @, and ## is a literal #).  Additionally, # followed by an uppercase
+letter or ?[\]^ is converted to its corresponding unprintable character by
+XORing with 0x40, a la caret notation.
 
 The only proper "assignment" operators (aside from pointer assignment) are the
 digits 0 through 9.  These act as unary functions that take a pointer as an

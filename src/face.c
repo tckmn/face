@@ -293,9 +293,11 @@ int dups(void **vars_orig, char *data, size_t *ip, void *ptr) {
 size_t preprocess(char *data, size_t data_len) {
     size_t i, j;
     for (i = 0, j = 0; i < data_len; ++i, ++j) {
-        if (data[i] == '@')      data[j] = '\0';
-        else if (data[i] == '#') data[j] = data[++i];
-        else                     data[j] = data[i];
+        if (data[i] == '@') data[j] = '\0';
+        else if (data[i] == '#') {
+            char c = data[++i];
+            data[j] = ('?' <= c && c <= '_' && c != '@') ? c ^ 0x40 : c;
+        } else data[j] = data[i];
     }
     return j;
 }
