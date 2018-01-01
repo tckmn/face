@@ -1,4 +1,4 @@
 *** test arithmetic operators ***
 
-    (%d@)\$*,c'$ma*mb*mc*3a4b+cabpa=$ico>wb=a>
+    (%d@)\$*,c'$ma*mb*mc*3a4b+cabpa=$cco>wb=a>
         7
