@@ -1,0 +1,4 @@
+*** test arithmetic operators ***
+
+    (%d@)\$*,c'$ma*mb*mc*3a4b+cabpa=$ico>wb=a>
+        7
