@@ -482,9 +482,9 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
             if (TF(ARG2)) {
 jump:
                 for (char lbl = data[ip-1];;) {
+                    if (ip == data_len) ip = 0;
                     if (data[ip] == ':' && data[ip+1] == lbl) break;
                     ++ip;
-                    if (ip == data_len) ip = 0;
                 }
             }
             break;
