@@ -34,10 +34,10 @@
 #define ARG4 ARG(-4)
 
 #define OARG(n) (vars_orig[(int)data[ip + (n)]])
-#define OARG1 OARG(1)
-#define OARG2 OARG(2)
-#define OARG3 OARG(3)
-#define OARG4 OARG(4)
+#define OARG1 OARG(-1)
+#define OARG2 OARG(-2)
+#define OARG3 OARG(-3)
+#define OARG4 OARG(-4)
 
 #define TYPE_SIZE ( \
     nummode == CHAR ? sizeof(char) : \
@@ -407,7 +407,7 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
 
         case '.':
             // unconditional jump
-            ++ip;
+            ip += 2;
             goto jump;
 
         case '/':
@@ -478,16 +478,14 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
 
         case '?':
             // conditional jump
+            ip += 3;
             if (TF(ARG2)) {
-                ip += 2;
 jump:
-                for (char lbl = data[ip++];;) {
+                for (char lbl = data[ip-1];;) {
                     if (data[ip] == ':' && data[ip+1] == lbl) break;
                     ++ip;
                     if (ip == data_len) ip = 0;
                 }
-            } else {
-                ip += 3;
             }
             break;
 
