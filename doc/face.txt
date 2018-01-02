@@ -121,19 +121,25 @@ Uppercase letters are typically collections of related functions:
   Ac   *a = argc
   Av   a = argv
 
-  M(   *a = ceil((double)*b)
-  MC   *a = acos((double)*b)
-  MS   *a = asin((double)*b)
-  MT   *a = atan((double)*b)
-  M^   *a = pow((double)*b * (double)*c)
-  Mc   *a = cos((double)*b)
-  Me   *a = exp((double)*b)
-  Mf   *a = floor((double)*b)
-  Ml   *a = log((double)*b)
+  M(   *a = ceil(*b)
+  MC   *a = acos(*b)
+  MS   *a = asin(*b)
+  MT   *a = atan(*b)
+  M^   *a = pow(*b * *c)
+  Ma   *a = abs(*b)
+  Mc   *a = cos(*b)
+  Me   *a = exp(*b)
+  Mf   *a = floor(*b)
+  Ml   *a = log(*b)
   Mp   *a = M_PI
-  Mr   *a = round((double)*b)
-  Ms   *a = sin((double)*b)
-  Mt   *a = tan((double)*b)
+  Mr   *a = round(*b)
+  Ms   *a = sin(*b)
+  Mt   *a = tan(*b)
 
   Sc   *a = strcmp(b, c)
   Sl   *a = strlen(b)
+
+The math functions that have X, Xf, and Xl variants use the appropriate one in
+floating point nummodes and fallback to the X (double) version otherwise.  The
+abs function uses the appropriate function from abs, labs, llabs, fabs, fabsf,
+and fabsl, falling back to abs for chars and shorts.

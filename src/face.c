@@ -565,6 +565,18 @@ jump:
                 ip += 4;
                 FFUNC2(pow, ARG3, ARG2, ARG1);
                 break;
+            case 'a':
+                ip += 3;
+                if (nummode == CHAR || nummode == SHORT) {
+                    ASSIGN(ARG2, DEREF_AS(int, ARG1));
+                } else if (nummode == INT) {
+                    *(int*)ARG2 = abs(*(int*)ARG1);
+                } else if (nummode == LONG) {
+                    *(long*)ARG2 = labs(*(long*)ARG1);
+                } else if (nummode == LLONG) {
+                    *(long long*)ARG2 = llabs(*(long long*)ARG1);
+                } else FFUNC1(fabs, ARG2, ARG1);
+                break;
             case 'c':
                 ip += 3;
                 FFUNC1(cos, ARG2, ARG1);
