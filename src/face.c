@@ -48,6 +48,7 @@
     nummode == FLOAT ? sizeof(float) : \
     nummode == DOUBLE ? sizeof(double) : \
     nummode == LDOUBLE ? sizeof(long double) : \
+    nummode == PTR ? sizeof(void*) : \
     0 \
     )
 
@@ -72,6 +73,7 @@
     nummode == FLOAT ? (*((float*)(x)) ? 1 : 0) : \
     nummode == DOUBLE ? (*((double*)(x)) ? 1 : 0) : \
     nummode == LDOUBLE ? (*((long double*)(x)) ? 1 : 0) : \
+    nummode == PTR ? (*((void**)(x)) ? 1 : 0) : \
     0 \
     )
 
@@ -240,6 +242,8 @@
         (res) = (double*)(x) + (n); \
     } else if (nummode == LDOUBLE) { \
         (res) = (long double*)(x) + (n); \
+    } else if (nummode == PTR) { \
+        (res) = (void**)(x) + (n); \
     } \
 } while (0)
 
@@ -271,7 +275,8 @@ enum nummode {
     LLONG,
     FLOAT,
     DOUBLE,
-    LDOUBLE
+    LDOUBLE,
+    PTR
 };
 
 /*
@@ -398,6 +403,8 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
                 case 'D': nummode = DOUBLE; numsigned = 1; break;
                 case 'e': nummode = LDOUBLE; numsigned = 0; break;
                 case 'E': nummode = LDOUBLE; numsigned = 1; break;
+                case 'p': nummode = PTR; numsigned = 0; break;
+                case 'P': nummode = PTR; numsigned = 1; break;
             }
             break;
 
