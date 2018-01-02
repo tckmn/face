@@ -32,3 +32,15 @@
         0 1 0
     (%d %d %d@)\$*,c'$m0*m1*m2*001122!00!11!22p0=$c0c1c2o>w0=0>
         1 0 0
+
+*** test nummodes / conversions ***
+
+converting 257 to a char should result in 1
+    (%d@)\$*,c'$,ima*mb*2a*aaa*aaa*aaa1b+aab;ca,cpa=$cao>wa=a>
+        1
+converting a float should truncate
+    (%d@)\$*,c'$,fma*mb*8a3b/aab;ia,ipa=$iao>wa=a>
+        2
+we should be able to convert to floats as well
+    (%.2f@)\$*,c'$ma*3a;dapa=$dao>wa=a>
+        3.00
