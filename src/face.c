@@ -271,7 +271,7 @@
     } \
 } while (0)
 
-#define FFUNC1(func, res, arg) \
+#define FFUNC1(func, res, arg) do { \
     if (nummode == FLOAT) { \
         *(float*)(res) = (func ## f)(*(float*)arg); \
     } else if (nummode == DOUBLE) { \
@@ -280,9 +280,10 @@
         *(long double*)(res) = (func ## l)(*(long double*)arg); \
     } else { \
         ASSIGN((res), func(DEREF_AS(double, (arg)))); \
-    }
+    } \
+} while (0)
 
-#define FFUNC2(func, res, arg1, arg2) \
+#define FFUNC2(func, res, arg1, arg2) do { \
     if (nummode == FLOAT) { \
         *(float*)(res) = (func ## f)(*(float*)(arg1), *(float*)(arg2)); \
     } else if (nummode == DOUBLE) { \
@@ -291,7 +292,8 @@
         *(long double*)(res) = (func ## l)(*(long double*)(arg1), *(long double*)(arg2)); \
     } else { \
         ASSIGN((res), func(DEREF_AS(double, (arg1)), DEREF_AS(double, (arg2)))); \
-    }
+    } \
+} while (0)
 
 enum nummode {
     CHAR,
@@ -553,6 +555,15 @@ jump:
                 ip += 3;
                 FFUNC1(acos, ARG2, ARG1);
                 break;
+            case 'M':
+                ip += 4;
+                if (nummode == CHAR || nummode == SHORT || nummode == INT ||
+                        nummode == LONG || nummode == LLONG) {
+                    long long a = DEREF_AS(long long, ARG2),
+                              b = DEREF_AS(long long, ARG1);
+                    ASSIGN(ARG3, a > b ? a : b);
+                } else FFUNC2(fmax, ARG3, ARG2, ARG1);
+                break;
             case 'S':
                 ip += 3;
                 FFUNC1(asin, ARG2, ARG1);
@@ -592,6 +603,15 @@ jump:
             case 'l':
                 ip += 3;
                 FFUNC1(log, ARG2, ARG1);
+                break;
+            case 'm':
+                ip += 4;
+                if (nummode == CHAR || nummode == SHORT || nummode == INT ||
+                        nummode == LONG || nummode == LLONG) {
+                    long long a = DEREF_AS(long long, ARG2),
+                              b = DEREF_AS(long long, ARG1);
+                    ASSIGN(ARG3, a < b ? a : b);
+                } else FFUNC2(fmin, ARG3, ARG2, ARG1);
                 break;
             case 'p':
                 ip += 2;

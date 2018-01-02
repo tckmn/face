@@ -123,6 +123,7 @@ Uppercase letters are typically collections of related functions:
 
   M(   *a = ceil(*b)
   MC   *a = acos(*b)
+  MM   *a = max(*b, *c);
   MS   *a = asin(*b)
   MT   *a = atan(*b)
   M^   *a = pow(*b * *c)
@@ -131,6 +132,7 @@ Uppercase letters are typically collections of related functions:
   Me   *a = exp(*b)
   Mf   *a = floor(*b)
   Ml   *a = log(*b)
+  Mm   *a = min(*b, *c);
   Mp   *a = M_PI
   Mr   *a = round(*b)
   Ms   *a = sin(*b)
@@ -142,4 +144,5 @@ Uppercase letters are typically collections of related functions:
 The math functions that have X, Xf, and Xl variants use the appropriate one in
 floating point nummodes and fallback to the X (double) version otherwise.  The
 abs function uses the appropriate function from abs, labs, llabs, fabs, fabsf,
-and fabsl, falling back to abs for chars and shorts.
+and fabsl, falling back to abs for chars and shorts.  max and min use the
+appropriate fmax/fmin function for floats and a custom implementation for ints.
