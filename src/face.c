@@ -337,7 +337,7 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
         case '"':
             // shift pointer
             ip += 3;
-            PTR_ADD(ARG2, ARG2, DEREF_AS(int, ARG1) * TYPE_SIZE);
+            PTR_ADD(ARG2, ARG2, DEREF_AS(int, ARG1));
             break;
 
         case '$':
@@ -363,7 +363,7 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
         case '\'':
             // increment pointer
             ip += 2;
-            PTR_ADD(ARG1, ARG1, TYPE_SIZE);
+            PTR_ADD(ARG1, ARG1, 1);
             break;
 
         case '(':
@@ -560,7 +560,7 @@ jump:
         case '`':
             // decrement pointer
             ip += 2;
-            PTR_ADD(ARG1, ARG1, -TYPE_SIZE);
+            PTR_ADD(ARG1, ARG1, -1);
             break;
 
         case 'c':
