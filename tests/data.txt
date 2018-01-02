@@ -65,3 +65,14 @@ jumps should choose the first label they encounter
 fun edge case
     \$*o>m_*mn*.::..L1nw_$n>:L2nw_$n>
         \$
+
+*** test conditional jumps ***
+
+    \$*mi*m1*115io>:_wi$i>-ii1?i_
+        \$*mi\$*m\$*\$\
+    \$*:"?*"
+        *timeout*
+    \$*m0*00?0!10o>w0$0>
+        \
+    \$*m0*10?0!10o>w0$0>
+        *timeout*
