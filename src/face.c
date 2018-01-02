@@ -271,6 +271,28 @@
     } \
 } while (0)
 
+#define FFUNC1(func, res, arg) \
+    if (nummode == FLOAT) { \
+        *(float*)(res) = (func ## f)(*(float*)arg); \
+    } else if (nummode == DOUBLE) { \
+        *(double*)(res) = func(*(double*)arg); \
+    } else if (nummode == LDOUBLE) { \
+        *(long double*)(res) = (func ## l)(*(long double*)arg); \
+    } else { \
+        ASSIGN((res), func(DEREF_AS(double, (arg)))); \
+    }
+
+#define FFUNC2(func, res, arg1, arg2) \
+    if (nummode == FLOAT) { \
+        *(float*)(res) = (func ## f)(*(float*)(arg1), *(float*)(arg2)); \
+    } else if (nummode == DOUBLE) { \
+        *(double*)(res) = func(*(double*)(arg1), *(double*)(arg2)); \
+    } else if (nummode == LDOUBLE) { \
+        *(long double*)(res) = (func ## l)(*(long double*)(arg1), *(long double*)(arg2)); \
+    } else { \
+        ASSIGN((res), func(DEREF_AS(double, (arg1)), DEREF_AS(double, (arg2)))); \
+    }
+
 enum nummode {
     CHAR,
     SHORT,
@@ -525,39 +547,39 @@ jump:
             switch (data[++ip]) {
             case '(': // it looks like a C and both c and C are taken
                 ip += 3;
-                ASSIGN(ARG2, ceil(DEREF_AS(double, ARG1)));
+                FFUNC1(ceil, ARG2, ARG1);
                 break;
             case 'C':
                 ip += 3;
-                ASSIGN(ARG2, acos(DEREF_AS(double, ARG1)));
+                FFUNC1(acos, ARG2, ARG1);
                 break;
             case 'S':
                 ip += 3;
-                ASSIGN(ARG2, asin(DEREF_AS(double, ARG1)));
+                FFUNC1(asin, ARG2, ARG1);
                 break;
             case 'T':
                 ip += 3;
-                ASSIGN(ARG2, atan(DEREF_AS(double, ARG1)));
+                FFUNC1(atan, ARG2, ARG1);
                 break;
             case '^':
                 ip += 4;
-                ASSIGN(ARG3, pow(DEREF_AS(double, ARG2), DEREF_AS(double, ARG1)));
+                FFUNC2(pow, ARG3, ARG2, ARG1);
                 break;
             case 'c':
                 ip += 3;
-                ASSIGN(ARG2, cos(DEREF_AS(double, ARG1)));
+                FFUNC1(cos, ARG2, ARG1);
                 break;
             case 'e':
                 ip += 3;
-                ASSIGN(ARG2, exp(DEREF_AS(double, ARG1)));
+                FFUNC1(exp, ARG2, ARG1);
                 break;
             case 'f':
                 ip += 3;
-                ASSIGN(ARG2, floor(DEREF_AS(double, ARG1)));
+                FFUNC1(floor, ARG2, ARG1);
                 break;
             case 'l':
                 ip += 3;
-                ASSIGN(ARG2, log(DEREF_AS(double, ARG1)));
+                FFUNC1(log, ARG2, ARG1);
                 break;
             case 'p':
                 ip += 2;
@@ -565,15 +587,15 @@ jump:
                 break;
             case 'r':
                 ip += 3;
-                ASSIGN(ARG2, round(DEREF_AS(double, ARG1)));
+                FFUNC1(round, ARG2, ARG1);
                 break;
             case 's':
                 ip += 3;
-                ASSIGN(ARG2, sin(DEREF_AS(double, ARG1)));
+                FFUNC1(sin, ARG2, ARG1);
                 break;
             case 't':
                 ip += 3;
-                ASSIGN(ARG2, tan(DEREF_AS(double, ARG1)));
+                FFUNC1(tan, ARG2, ARG1);
                 break;
             }
             break;
