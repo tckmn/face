@@ -44,40 +44,40 @@
 #define OARG4 OARG(-4)
 
 #define TYPE_SIZE ( \
-    nummode == CHAR ? sizeof(char) : \
-    nummode == SHORT ? sizeof(short) : \
-    nummode == INT ? sizeof(int) : \
-    nummode == LONG ? sizeof(long) : \
-    nummode == LLONG ? sizeof(long long) : \
-    nummode == FLOAT ? sizeof(float) : \
-    nummode == DOUBLE ? sizeof(double) : \
+    nummode == CHAR    ? sizeof(char)        : \
+    nummode == SHORT   ? sizeof(short)       : \
+    nummode == INT     ? sizeof(int)         : \
+    nummode == LONG    ? sizeof(long)        : \
+    nummode == LLONG   ? sizeof(long long)   : \
+    nummode == FLOAT   ? sizeof(float)       : \
+    nummode == DOUBLE  ? sizeof(double)      : \
     nummode == LDOUBLE ? sizeof(long double) : \
-    nummode == PTR ? sizeof(void*) : \
+    nummode == PTR     ? sizeof(void*)       : \
     0 \
     )
 
 #define DEREF_AS(type, x) ( \
-    nummode == CHAR ? (numsigned ? (type)(*((signed char*)(x))) : (type)(*((unsigned char*)(x)))) : \
-    nummode == SHORT ? (numsigned ? (type)(*((signed short*)(x))) : (type)(*((unsigned short*)(x)))) : \
-    nummode == INT ? (numsigned ? (type)(*((signed int*)(x))) : (type)(*((unsigned int*)(x)))) : \
-    nummode == LONG ? (numsigned ? (type)(*((signed long*)(x))) : (type)(*((unsigned long*)(x)))) : \
-    nummode == LLONG ? (numsigned ? (type)(*((signed long long*)(x))) : (type)(*((unsigned long long*)(x)))) : \
-    nummode == FLOAT ? (type)(*((float*)(x))) : \
-    nummode == DOUBLE ? (type)(*((double*)(x))) : \
-    nummode == LDOUBLE ? (type)(*((long double*)(x))) : \
+    nummode == CHAR    ? (numsigned ? (type)*(signed char*)(x)      : (type)*(unsigned char*)(x))      : \
+    nummode == SHORT   ? (numsigned ? (type)*(signed short*)(x)     : (type)*(unsigned short*)(x))     : \
+    nummode == INT     ? (numsigned ? (type)*(signed int*)(x)       : (type)*(unsigned int*)(x))       : \
+    nummode == LONG    ? (numsigned ? (type)*(signed long*)(x)      : (type)*(unsigned long*)(x))      : \
+    nummode == LLONG   ? (numsigned ? (type)*(signed long long*)(x) : (type)*(unsigned long long*)(x)) : \
+    nummode == FLOAT   ? (type)*(float*)(x)       : \
+    nummode == DOUBLE  ? (type)*(double*)(x)      : \
+    nummode == LDOUBLE ? (type)*(long double*)(x) : \
     (type)0 \
     )
 
 #define TF(x) (\
-    nummode == CHAR ? (numsigned ? (*((signed char*)(x)) ? 1 : 0) : (*((unsigned char*)(x)) ? 1 : 0)) : \
-    nummode == SHORT ? (numsigned ? (*((signed short*)(x)) ? 1 : 0) : (*((unsigned short*)(x)) ? 1 : 0)) : \
-    nummode == INT ? (numsigned ? (*((signed int*)(x)) ? 1 : 0) : (*((unsigned int*)(x)) ? 1 : 0)) : \
-    nummode == LONG ? (numsigned ? (*((signed long*)(x)) ? 1 : 0) : (*((unsigned long*)(x)) ? 1 : 0)) : \
-    nummode == LLONG ? (numsigned ? (*((signed long long*)(x)) ? 1 : 0) : (*((unsigned long long*)(x)) ? 1 : 0)) : \
-    nummode == FLOAT ? (*((float*)(x)) ? 1 : 0) : \
-    nummode == DOUBLE ? (*((double*)(x)) ? 1 : 0) : \
-    nummode == LDOUBLE ? (*((long double*)(x)) ? 1 : 0) : \
-    nummode == PTR ? (*((void**)(x)) ? 1 : 0) : \
+    nummode == CHAR    ? (numsigned ? (*(signed char*)(x)      ? 1 : 0) : (*(unsigned char*)(x)      ? 1 : 0)) : \
+    nummode == SHORT   ? (numsigned ? (*(signed short*)(x)     ? 1 : 0) : (*(unsigned short*)(x)     ? 1 : 0)) : \
+    nummode == INT     ? (numsigned ? (*(signed int*)(x)       ? 1 : 0) : (*(unsigned int*)(x)       ? 1 : 0)) : \
+    nummode == LONG    ? (numsigned ? (*(signed long*)(x)      ? 1 : 0) : (*(unsigned long*)(x)      ? 1 : 0)) : \
+    nummode == LLONG   ? (numsigned ? (*(signed long long*)(x) ? 1 : 0) : (*(unsigned long long*)(x) ? 1 : 0)) : \
+    nummode == FLOAT   ? (*(float*)(x)       ? 1 : 0) : \
+    nummode == DOUBLE  ? (*(double*)(x)      ? 1 : 0) : \
+    nummode == LDOUBLE ? (*(long double*)(x) ? 1 : 0) : \
+    nummode == PTR     ? (*(void**)(x)       ? 1 : 0) : \
     0 \
     )
 
@@ -230,25 +230,15 @@
 } while (0)
 
 #define PTR_ADD(res, x, n) do { \
-    if (nummode == CHAR) { \
-        (res) = (char*)(x) + (n); \
-    } else if (nummode == SHORT) { \
-        (res) = (short*)(x) + (n); \
-    } else if (nummode == INT) { \
-        (res) = (int*)(x) + (n); \
-    } else if (nummode == LONG) { \
-        (res) = (long*)(x) + (n); \
-    } else if (nummode == LLONG) { \
-        (res) = (long long*)(x) + (n); \
-    } else if (nummode == FLOAT) { \
-        (res) = (float*)(x) + (n); \
-    } else if (nummode == DOUBLE) { \
-        (res) = (double*)(x) + (n); \
-    } else if (nummode == LDOUBLE) { \
-        (res) = (long double*)(x) + (n); \
-    } else if (nummode == PTR) { \
-        (res) = (void**)(x) + (n); \
-    } \
+         if (nummode == CHAR)    { (res) = (char*)(x)        + (n); } \
+    else if (nummode == SHORT)   { (res) = (short*)(x)       + (n); } \
+    else if (nummode == INT)     { (res) = (int*)(x)         + (n); } \
+    else if (nummode == LONG)    { (res) = (long*)(x)        + (n); } \
+    else if (nummode == LLONG)   { (res) = (long long*)(x)   + (n); } \
+    else if (nummode == FLOAT)   { (res) = (float*)(x)       + (n); } \
+    else if (nummode == DOUBLE)  { (res) = (double*)(x)      + (n); } \
+    else if (nummode == LDOUBLE) { (res) = (long double*)(x) + (n); } \
+    else if (nummode == PTR)     { (res) = (void**)(x)       + (n); } \
 } while (0)
 
 #define ASSIGN(x, val) do { \
