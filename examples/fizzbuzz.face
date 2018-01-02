@@ -1,0 +1,17 @@
+(FizzBuzz%d@
+)
+\F*,c'Fo>               ( obtain data pointer, a number, and stdout )
+m+*1+                   ( counter variable, goes from 1 to 100 )
+m=*m?*                  ( result and temp variables )
+m1+m3+m4+m5+11334455    ( relevant constants )
+$BF"B4$%B"%4$N%"N3      ( get pointers to Fizz, Buzz, %d, and \n )
+:~
+    0?                  ( has either Fizz or Buzz been printed? )
+    %=+3?=3             ( skip to label 3 if not divisible by 3 )
+    1?w=F4>:3           ( otherwise, print "Fizz" )
+    %=+5?=51?w=B4>:5    ( same for "Buzz" )
+    ??+p="%c+w="=>:+    ( if we didn't print anything, print the number )
+    w=N1>               ( print a newline )
+    +++1                ( increment the counter )
+    *=55*==4+==1-=+=    ( set the result variable to 100-n )
+?=~
