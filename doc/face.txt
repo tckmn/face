@@ -119,10 +119,20 @@ Uppercase letters are typically collections of related functions:
 
   Ac   *a = argc
   Av   a = argv
+
+  M(   *a = ceil((double)*b)
+  MC   *a = acos((double)*b)
+  MS   *a = asin((double)*b)
+  MT   *a = atan((double)*b)
+  M^   *a = pow((double)*b * (double)*c)
   Mc   *a = cos((double)*b)
   Me   *a = exp((double)*b)
-  Mp   *a = pow((double)*b * (double)*c)
+  Mf   *a = floor((double)*b)
+  Ml   *a = log((double)*b)
+  Mp   *a = M_PI
+  Mr   *a = round((double)*b)
   Ms   *a = sin((double)*b)
   Mt   *a = tan((double)*b)
+
   Sc   *a = strcmp(b, c)
   Sl   *a = strlen(b)

@@ -25,6 +25,10 @@
 
 #include "face.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #define NVARS 128
 
 #define ARG(n) (vars[(int)data[ip + (n)]])
@@ -513,6 +517,26 @@ jump:
 
         case 'M':
             switch (data[++ip]) {
+            case '(': // it looks like a C and both c and C are taken
+                ip += 3;
+                ASSIGN(ARG2, ceil(DEREF_AS(double, ARG1)));
+                break;
+            case 'C':
+                ip += 3;
+                ASSIGN(ARG2, acos(DEREF_AS(double, ARG1)));
+                break;
+            case 'S':
+                ip += 3;
+                ASSIGN(ARG2, asin(DEREF_AS(double, ARG1)));
+                break;
+            case 'T':
+                ip += 3;
+                ASSIGN(ARG2, atan(DEREF_AS(double, ARG1)));
+                break;
+            case '^':
+                ip += 4;
+                ASSIGN(ARG3, pow(DEREF_AS(double, ARG2), DEREF_AS(double, ARG1)));
+                break;
             case 'c':
                 ip += 3;
                 ASSIGN(ARG2, cos(DEREF_AS(double, ARG1)));
@@ -521,9 +545,21 @@ jump:
                 ip += 3;
                 ASSIGN(ARG2, exp(DEREF_AS(double, ARG1)));
                 break;
+            case 'f':
+                ip += 3;
+                ASSIGN(ARG2, floor(DEREF_AS(double, ARG1)));
+                break;
+            case 'l':
+                ip += 3;
+                ASSIGN(ARG2, log(DEREF_AS(double, ARG1)));
+                break;
             case 'p':
-                ip += 4;
-                ASSIGN(ARG3, pow(DEREF_AS(double, ARG2), DEREF_AS(double, ARG1)));
+                ip += 2;
+                ASSIGN(ARG1, M_PI);
+                break;
+            case 'r':
+                ip += 3;
+                ASSIGN(ARG2, round(DEREF_AS(double, ARG1)));
                 break;
             case 's':
                 ip += 3;
