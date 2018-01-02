@@ -3,14 +3,15 @@ TARGET = bin/$(NAME)
 MANPAGE = $(NAME).1
 PREFIX ?= /usr/local
 CC ?= gcc
-LIBS = -lm -I/usr/lib/libffi-3.2.1/include -lffi
+LIBS = -lm -lffi
+SEARCH = -I/usr/lib/libffi-3.2.1/include
 .PHONY: all debug release install clean test
 
 all: $(TARGET)
 
 bin/%.o: src/%.c $(wildcard src/*.h)
 	@mkdir -p bin
-	$(CC) $(FLAGS) -std=c99 -Wall -Wextra -Wpedantic -c $< -o $@ $(LIBS)
+	$(CC) $(FLAGS) -std=c99 -Wall -Wextra -Wpedantic -c $< -o $@ $(SEARCH)
 
 $(TARGET): $(patsubst src/%.c, bin/%.o, $(wildcard src/*.c))
 	@mkdir -p bin

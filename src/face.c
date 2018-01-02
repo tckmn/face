@@ -640,7 +640,10 @@ jump:
             ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 3, 3 + count,
                     &ffi_type_sint, atypes);
             ffi_arg res;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
             ffi_call(&cif, snprintf, &res, avalues);
+#pragma GCC diagnostic pop
             size = ((int)res) + 1;
             // basically copy/paste of malloc command
             if (dups(vars_orig, data, &ip, OARG2)) {
@@ -652,7 +655,10 @@ jump:
             // call snprintf for the second time
             avalues[0] = &ARG2;
             ip = i;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
             ffi_call(&cif, snprintf, &res, avalues);
+#pragma GCC diagnostic pop
             ASSIGN(ARG(-3 - count*2), (int)res);
             break;
         }
@@ -687,7 +693,10 @@ jump:
             ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 2, 2 + count,
                     &ffi_type_sint, atypes);
             ffi_arg res;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
             ffi_call(&cif, sscanf, &res, avalues);
+#pragma GCC diagnostic pop
             ASSIGN(ARG(-3 - count*2), (int)res);
             break;
         }
