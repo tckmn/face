@@ -11,11 +11,11 @@ all: $(TARGET)
 
 bin/%.o: src/%.c $(wildcard src/*.h)
 	@mkdir -p bin
-	$(CC) $(FLAGS) -std=c99 -Wall -Wextra -Wpedantic -c $< -o $@ $(SEARCH)
+	$(CC) $(FLAGS) -std=c99 -Wall -Wextra -Wpedantic -Werror -c $< -o $@ $(SEARCH)
 
 $(TARGET): $(patsubst src/%.c, bin/%.o, $(wildcard src/*.c))
 	@mkdir -p bin
-	$(CC) $(FLAGS) -std=c99 -Wall -Wextra -Wpedantic $^ -o $@ $(LIBS)
+	$(CC) $(FLAGS) -std=c99 -Wall -Wextra -Wpedantic -Werror $^ -o $@ $(LIBS)
 
 debug: FLAGS = -g -O0
 
