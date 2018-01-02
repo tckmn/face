@@ -498,6 +498,19 @@ jump:
             }
             break;
 
+        case 'A':
+            switch (data[++ip]) {
+            case 'c':
+                ip += 2;
+                ASSIGN(ARG1, argc);
+                break;
+            case 'v':
+                ip += 2;
+                ARG1 = argv;
+                break;
+            }
+            break;
+
         case 'M':
             switch (data[++ip]) {
             case 'c':
