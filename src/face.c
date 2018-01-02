@@ -253,21 +253,26 @@
 
 #define ASSIGN(x, val) do { \
     if (nummode == CHAR) { \
-        if (numsigned) { *((signed char*)(x)) = val; } else { *((unsigned char*)(x)) = val; } \
+        if (numsigned) *(signed char*)(x)        = (signed char)(val); \
+        else           *(unsigned char*)(x)      = (unsigned char)(val); \
     } else if (nummode == SHORT) { \
-        if (numsigned) { *((signed short*)(x)) = val; } else { *((unsigned short*)(x)) = val; } \
+        if (numsigned) *(signed short*)(x)       = (signed short)(val); \
+        else           *(unsigned short*)(x)     = (unsigned short)(val); \
     } else if (nummode == INT) { \
-        if (numsigned) { *((signed int*)(x)) = val; } else { *((unsigned int*)(x)) = val; } \
+        if (numsigned) *(signed int*)(x)         = (signed int)(val); \
+        else           *(unsigned int*)(x)       = (unsigned int)(val); \
     } else if (nummode == LONG) { \
-        if (numsigned) { *((signed long*)(x)) = val; } else { *((unsigned long*)(x)) = val; } \
+        if (numsigned) *(signed long*)(x)        = (signed long)(val); \
+        else           *(unsigned long*)(x)      = (unsigned long)(val); \
     } else if (nummode == LLONG) { \
-        if (numsigned) { *((signed long long*)(x)) = val; } else { *((unsigned long long*)(x)) = val; } \
+        if (numsigned) *(signed long long*)(x)   = (signed long long)(val); \
+        else           *(unsigned long long*)(x) = (unsigned long long)(val); \
     } else if (nummode == FLOAT) { \
-        *((float*)(x)) = val; \
+        *(float*)(x)       = (float)(val); \
     } else if (nummode == DOUBLE) { \
-        *((double*)(x)) = val; \
+        *(double*)(x)      = (double)(val); \
     } else if (nummode == LDOUBLE) { \
-        *((long double*)(x)) = val; \
+        *(long double*)(x) = (long double)(val); \
     } \
 } while (0)
 
@@ -615,7 +620,7 @@ jump:
                 break;
             case 'p':
                 ip += 2;
-                ASSIGN(ARG1, (double)M_PI);
+                ASSIGN(ARG1, M_PI);
                 break;
             case 'r':
                 ip += 3;
@@ -628,6 +633,23 @@ jump:
             case 't':
                 ip += 3;
                 FFUNC1(tan, ARG2, ARG1);
+                break;
+            }
+            break;
+
+        case 'R':
+            switch (data[++ip]) {
+            case 'm':
+                ip += 2;
+                ASSIGN(ARG1, RAND_MAX);
+                break;
+            case 'r':
+                ip += 2;
+                ASSIGN(ARG1, rand());
+                break;
+            case 's':
+                ip += 2;
+                srand(DEREF_AS(unsigned int, ARG1));
                 break;
             }
             break;

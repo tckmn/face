@@ -138,6 +138,10 @@ Uppercase letters are typically collections of related functions:
   Ms   *a = sin(*b)
   Mt   *a = tan(*b)
 
+  Rm   *a = RAND_MAX
+  Rr   *a = rand()
+  Rs   srand(*a)
+
   Sc   *a = strcmp(b, c)
   Sl   *a = strlen(b)
 
