@@ -44,3 +44,24 @@ converting a float should truncate
 we should be able to convert to floats as well
     (%.2f@)\$*,c'$ma*3a;dapa=$dao>wa=a>
         3.00
+
+*** test unconditional jumps ***
+
+when n is 4, the fwrite command should be skipped by the jump
+    \$*o>m_*mn*3nw_$n>4n.|w_$n>:|5nw_$n>
+        \$*\$*o>
+jumps backwards should work too
+    \$*o>m_*mn*1nw_$n>.B:A2nw_$n>q:B3nw_$n>.A
+        \\$*\$
+basic infinite loop
+    :...
+        *timeout*
+a jump with nowhere to go will hang
+    .*
+        *timeout*
+jumps should choose the first label they encounter
+    \$*o>m_*mn*:|1nw_$n>.|2nw_$n>:|3nw_$n>:|4nw_$n>
+        \\$*\$*o
+fun edge case
+    \$*o>m_*mn*.::..L1nw_$n>:L2nw_$n>
+        \$

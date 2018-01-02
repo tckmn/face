@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TIMEOUT=0.1 # may need adjusting on slower systems?
+
 out=
 lnum=0
 fail=0
@@ -13,7 +15,11 @@ do
         line="$(sed 's/^ *//' <<<"$line")"
         if [ -z "$out" ]
         then
-            out="x$(bin/face <(echo "$line"))"
+            out="x$(timeout $TIMEOUT bin/face <(echo "$line"))"
+            if [ $? -eq 124 ]
+            then
+                out='x*timeout*'
+            fi
         else
             if [ "$out" != "x$line" ]
             then
