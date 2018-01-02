@@ -536,6 +536,12 @@ jump:
             }
             break;
 
+        case '[':
+            // deref (*)
+            ip += 3;
+            ARG2 = *(void**)ARG1;
+            break;
+
         case '\\':
             // assign pointers to source code and instruction pointer
             ip += 3;
@@ -543,6 +549,12 @@ jump:
             if (!dups(vars_orig, data, &ip, OARG1)) free(OARG1);
             ARG2 = OARG2 = data;
             ARG1 = OARG1 = &ip;
+            break;
+
+        case ']':
+            // reference-of (&)
+            ip += 3;
+            ARG2 = &ARG1;
             break;
 
         case '^':
