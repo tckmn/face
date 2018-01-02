@@ -12,6 +12,7 @@ roughly corresponds to
   *a = *b + *c
 in C, and similarly !de is used for
   *d = !*e
+The % operator is patched to use the fmod* family of functions for floats.
 
 At every point in a face program, a global "number mode" exists that dictates
 how variables are dereferenced.  This defaults to signed integer (the int type

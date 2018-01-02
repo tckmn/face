@@ -355,7 +355,13 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
         case '%':
             // modulo
             ip += 4;
-            OP2_INT(ARG3, ARG2, %, ARG1);
+            if (nummode == FLOAT) {
+                *(float*)ARG3 = fmodf(*(float*)ARG2, *(float*)ARG1);
+            } else if (nummode == DOUBLE) {
+                *(double*)ARG3 = fmod(*(double*)ARG2, *(double*)ARG1);
+            } else if (nummode == LDOUBLE) {
+                *(long double*)ARG3 = fmodl(*(long double*)ARG2, *(long double*)ARG1);
+            } else OP2_INT(ARG3, ARG2, %, ARG1);
             break;
 
         case '&':
