@@ -615,7 +615,7 @@ jump:
                 break;
             case 'p':
                 ip += 2;
-                ASSIGN(ARG1, M_PI);
+                ASSIGN(ARG1, (double)M_PI);
                 break;
             case 'r':
                 ip += 3;
