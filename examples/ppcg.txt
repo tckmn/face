@@ -1,0 +1,3 @@
+I have solved some challenges on Programming Puzzles & Code Golf Stack Exchange
+in face, which can be found with the following search query:
+https://codegolf.stackexchange.com/search?q=user%3A3808+created%3A2017..+is%3Aa+face
