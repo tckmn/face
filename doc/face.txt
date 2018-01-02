@@ -33,6 +33,13 @@ can be one of the following:
 Lowercase letters are used for signed types, and uppercase for unsigned.  (Both
 work for floats and doubles, but there is no functional difference.)
 
+There is another quasi-number-mode, pointer mode (p).  This mode only exists to
+work with pointers to pointers, such as that returned by the Av (argv) command.
+DO NOT use any operators, make any assignments, or execute any command that
+involves the value of a variable while in pointer mode!  Bad Things will
+happen, as the only defined operations while in pointer mode are malloc and
+friends and the pointer manipulation commands $'`"_ (described below).
+
 Flow control in face is done entirely via jumps.  Labels are indicated with :x
 where x can be any ASCII character, and jumps can be unconditional or
 conditional.  An unconditional jump (corresponds to goto in C) is done with .x
@@ -110,6 +117,8 @@ it somewhat like the nonstandard GNU asprintf().
 
 Uppercase letters are typically collections of related functions:
 
+  Ac   *a = argc
+  Av   a = argv
   Mc   *a = cos((double)*b)
   Me   *a = exp((double)*b)
   Mp   *a = pow((double)*b * (double)*c)
