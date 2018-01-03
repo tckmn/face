@@ -15,11 +15,17 @@ do
         line="$(sed 's/^ *//' <<<"$line")"
         if [ -z "$out" ]
         then
-            out="x$(timeout $TIMEOUT bin/face <(echo "$line"))"
+            if [ "${line:0:1}" = '!' ]
+            then
+                out="x$(timeout $TIMEOUT bash -c "${line:1}")"
+            else
+                out="x$(timeout $TIMEOUT bin/face <(echo "$line"))"
+            fi
             if [ $? -eq 124 ]
             then
                 out='x*timeout*'
             fi
+            out="${out//$'\n'/\\n}"
         else
             if [ "$out" != "x$line" ]
             then
