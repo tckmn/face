@@ -535,7 +535,7 @@ jump:
                 break;
             case 'v':
                 ip += 2;
-                ARG1 = argv;
+                ARG1 = OARG1 = argv;
                 break;
             }
             break;
@@ -660,7 +660,7 @@ jump:
         case '[':
             // deref (*)
             ip += 3;
-            ARG2 = *(void**)ARG1;
+            ARG2 = OARG2 = *(void**)ARG1;
             break;
 
         case '\\':
@@ -675,7 +675,7 @@ jump:
         case ']':
             // reference-of (&)
             ip += 3;
-            ARG2 = &ARG1;
+            ARG2 = OARG2 = &ARG1;
             break;
 
         case '^':
