@@ -6,7 +6,18 @@ NAME
        face - fairly awful c-based esolang
 
 SYNOPSIS
-       face [OPTS]... FILENAME [ARGS]...
+       face [OPTS]... FILE [ARGS]...
+       face -h|--help
+       face -v|--version
+
+OPTIONS
+       -d, --debug
+              Enable  debug  output to standard error.  As of now, this simply
+              consists of each command as they are encountered.
+
+       -e, --exec CODE
+              Run code given as a command line argument.  Do not  specify  the
+              FILE argument if using this option.
 
 DESCRIPTION
        face  is  an  esoteric  programming language written in and based on C.

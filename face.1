@@ -4,8 +4,26 @@ face \- fairly awful c-based esolang
 .SH SYNOPSIS
 .B face
 [\fIOPTS\fR]... \
-\fIFILENAME\fR
+\fIFILE\fR
 [\fIARGS\fR]...
+.br
+.B face
+\-h|\-\-help
+.br
+.B face
+\-v|\-\-version
+.SH OPTIONS
+.TP
+.BR \-d ,\  \-\-debug
+Enable debug output to standard error.
+As of now, this simply consists of each command
+as they are encountered.
+.TP
+.BR \-e ,\  \-\-exec \ \fICODE
+Run code given as a command line argument.
+Do not specify the
+.I FILE
+argument if using this option.
 .SH DESCRIPTION
 .B face
 is an esoteric programming language
