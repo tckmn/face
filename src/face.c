@@ -842,10 +842,20 @@ jump:
             ASSIGN(ARG4, fwrite(ARG3, 1, DEREF_AS(size_t, ARG2), ARG1));
             break;
 
+        case '{':
+            ip += 2;
+            OARG1 = ARG1;
+            break;
+
         case '|':
             // bitwise OR
             ip += 4;
             OP2_INT(ARG3, ARG2, |, ARG1);
+            break;
+
+        case '}':
+            ip += 3;
+            ASSIGN(ARG2, ((char*)ARG1 - (char*)OARG1) / TYPE_SIZE);
             break;
 
         case '~':

@@ -66,7 +66,7 @@ DESCRIPTION
        execute any command that involves the value of a variable while in
        pointer mode!  Bad Things will happen, as the only defined operations
        while in pointer mode are malloc and friends and the pointer manipula‐
-       tion commands $'`"_ (described below).
+       tion commands $'`"_{} (described below).
 
        Flow control in face is done entirely via jumps.  Labels are indicated
        with :x where x can be any ASCII character, and jumps can be uncondi‐
@@ -105,13 +105,15 @@ DESCRIPTION
        $ab assigns the pointer value of b to a (a = b in C, where a and b are
        pointers).
 
-       There are also four other pointer manipulation commands.  The ' command
+       There are also six other pointer manipulation commands.  The ' command
        increments a pointer ('a is a++) and the ` command decrements a pointer
        (`a is a--).  The " command shifts a pointer by a given amount ("ab is
-       a += *b); note that the second argument is always dereferenced as a
-       signed integer regardless of number mode!  Finally, the unary _ command
-       "rewinds" or resets a pointer to its original value; that is, the value
-       it had before any '`" operations were performed on it.
+       a += *b).  The unary _ command "rewinds" or resets a pointer to its
+       original value; that is, the value it had before any '`" operations
+       were performed on it.  The unary { command sets the "original" value
+       used by _ to the current value.  Finally, the binary } command sets its
+       first argument to the "offset" of the pointer referred to by the second
+       argument (i.e. how much it has been moved by the '`" commands).
 
        Comments are expressed with the notation ( ... ) -- that is, when a (
        symbol is encountered in parsing, everything until the following ) is

@@ -91,6 +91,12 @@ fun edge case
         *,C
     \$*,Cm!*c@*3!-@@!"$!'$_$'$'$"$@'$'$o>w!$!>
         $*,
+    (%d.@)\$*,c'$,im:*`:`:`:m;*};:_:':o>p:"$i;w:":>};:p:"$i;w:":>{:};:p:"$i;w:":>
+        -3.1.0.
+    !bin/face -e '\$*mn*3no>Av@[@@wn@n>"@nwn@n>`@wn@n>_@wn@n>' -- foo bar baz quux
+        fooquubazfoo
+    !bin/face -e '\$*mn*3no>Av@[%@"%n$^%{^`^`%`%wn%n>wn^n>_%_^wn%n>wn^n>' -- foo bar baz quux
+        barbazfooquu
 
 *** tests from the examples directory ***
 

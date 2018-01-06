@@ -134,7 +134,7 @@ Bad Things will happen,
 as the only defined operations while in pointer mode are
 .B malloc
 and friends and the pointer manipulation commands
-.B $'`"_
+.B $'`"_{}
 (described below).
 .PP
 Flow control in face is done entirely via jumps.
@@ -236,7 +236,7 @@ and
 .B b
 are pointers).
 .PP
-There are also four other pointer manipulation commands.
+There are also six other pointer manipulation commands.
 The
 .B '
 command increments a pointer (\fB'a\fR is \fBa++\fR)
@@ -245,16 +245,25 @@ and the
 command decrements a pointer (\fB`a\fR is \fBa--\fR).
 The
 .B """
-command shifts a pointer by a given amount (\fB"ab\fR is \fBa += *b\fR);
-note that the second argument
-is always dereferenced as a signed integer
-regardless of number mode!
-Finally, the unary
+command shifts a pointer by a given amount (\fB"ab\fR is \fBa += *b\fR).
+The unary
 .B _
 command "rewinds" or resets a pointer to its original value;
 that is, the value it had before any
 .B '`"
 operations were performed on it.
+The unary
+.B {
+command sets the "original" value used by
+.B _
+to the current value.
+Finally, the binary
+.B }
+command sets its first argument
+to the "offset" of the pointer referred to by the second argument
+(i.e. how much it has been moved by the
+.B '`"
+commands).
 .PP
 Comments are expressed with the notation
 .B ( ... )
