@@ -18,26 +18,77 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "face.h"
 
 #define BUF_SIZE 500
 
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        fprintf(stderr, "usage: %s FILENAME [ARGS...]\n", argv[0]);
-        return 1;
+    int arg, help = 0, version = 0;
+    FILE *fp;
+    for (arg = 1; arg < argc; ++arg) {
+        if (*argv[arg] != '-') {
+            // first bare argument is the input filename
+            fp = fopen(argv[arg], "r");
+            if (!fp) {
+                fprintf(stderr, "cannot open file `%s' for reading\n", argv[arg]);
+                return 1;
+            }
+            break;
+        }
+        if (argv[arg][1] == '-') {
+            // stop parsing if -- is encountered
+            if (!argv[arg][2]) break;
+            // test for long options
+            if (!strcmp(argv[arg]+2, "help")) help = 1;
+            else if (!strcmp(argv[arg]+2, "version")) version = 1;
+            else {
+                fprintf(stderr, "unknown long option `%s'\n", argv[arg]);
+                return 1;
+            }
+            continue;
+        }
+        if (!argv[arg][1]) {
+            // a plain dash is interpreted as stdin
+            fp = stdin;
+            break;
+        }
+        // test for short options
+        for (char *opt = argv[arg]+1; *opt; ++opt) {
+            switch (*opt) {
+            case 'h':
+                help = 1;
+                break;
+            case 'v':
+                version = 1;
+                break;
+            default:
+                fprintf(stderr, "unknown short option `-%c'\n", *opt);
+                return 1;
+            }
+        }
     }
 
-    // open and check input file
-    FILE *fp;
-    if (argv[1][0] == '-' && !argv[1][1]) {
-        fp = stdin;
-    } else {
-        fp = fopen(argv[1], "r");
-        if (!fp) {
-            fprintf(stderr, "cannot open file %s for reading\n", argv[1]);
-            return 1;
-        }
+    if (help) {
+        printf("usage: %s FILENAME [ARGS]...\n"
+               "       %s -h|--help\n"
+               "       %s -v|--version\n",
+               argv[0], argv[0], argv[0]);
+        return 0;
+    }
+
+    if (version) {
+        // TODO update upon release of first actual version
+        printf("face version 0.0.0\n");
+        return 0;
+    }
+
+    if (!fp) {
+        fprintf(stderr, "usage: %s FILENAME [ARGS]...\n"
+                        "see `%s --help' or `man face' for more information\n",
+                        argv[0], argv[0]);
+        return 1;
     }
 
     // read file into memory
