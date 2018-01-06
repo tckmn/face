@@ -4,7 +4,7 @@ TIMEOUT=0.1 # may need adjusting on slower systems?
 
 out=
 lnum=0
-fail=0
+fail=()
 total=0
 
 while IFS= read -r line
@@ -29,8 +29,10 @@ do
         else
             if [ "$out" != "x$line" ]
             then
-                echo "test failure on line $lnum (expected $line, got ${out:1})"
-                fail=$((fail+1))
+                fail+=("test failure on line $lnum (expected $line, got ${out:1})")
+                echo -n !
+            else
+                echo -n .
             fi
             total=$((total+1))
             out=
@@ -38,10 +40,12 @@ do
     fi
 done <tests/data.txt
 
-if [ $fail -eq 0 ]
+echo
+if [ -z "$fail" ]
 then
     echo -e "\\e[1m\\e[32m$total tests passed\\e[m"
 else
-    echo -e "\\e[1m\\e[31m$fail/$total tests failed\\e[m"
+    printf '%s\n' "${fail[@]}"
+    echo -e "\\e[1m\\e[31m${#fail[@]}/$total tests failed\\e[m"
     exit 1
 fi
