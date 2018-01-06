@@ -334,7 +334,7 @@ size_t preprocess(char *data, size_t data_len) {
  * the main entry point for outside callers - runs data as face code with the
  * given arguments
  */
-void face_run(char *data, size_t data_len, int argc, char **argv) {
+void face_run(char *data, size_t data_len, int argc, char **argv, int debug) {
     data_len = preprocess(data, data_len);
 
     // instruction pointer - where we are inside of data
@@ -349,6 +349,10 @@ void face_run(char *data, size_t data_len, int argc, char **argv) {
     int numsigned = 1;
 
     while (ip < data_len) {
+        if (debug) {
+            fprintf(stderr, "%c", data[ip]);
+            fflush(stderr);
+        }
         switch (data[ip]) {
 
         case '!':

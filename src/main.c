@@ -24,12 +24,23 @@
 
 #define BUF_SIZE 500
 
+void usage(char *name) {
+    fprintf(stderr, "usage: %s [OPTS]... FILE [ARGS]...\n"
+                    "see `%s --help' or `man face' for more information\n",
+                    name, name);
+}
+
 int main(int argc, char **argv) {
-    int arg, help = 0, version = 0;
-    FILE *fp;
+    int arg, help = 0, version = 0, debug = 0;
+    FILE *fp = 0;
+    char *execstr = 0;
     for (arg = 1; arg < argc; ++arg) {
         if (*argv[arg] != '-') {
             // first bare argument is the input filename
+            if (execstr) {
+                usage(argv[0]);
+                return 1;
+            }
             fp = fopen(argv[arg], "r");
             if (!fp) {
                 fprintf(stderr, "cannot open file `%s' for reading\n", argv[arg]);
@@ -43,6 +54,8 @@ int main(int argc, char **argv) {
             // test for long options
             if (!strcmp(argv[arg]+2, "help")) help = 1;
             else if (!strcmp(argv[arg]+2, "version")) version = 1;
+            else if (!strcmp(argv[arg]+2, "debug")) debug = 1;
+            else if (!strcmp(argv[arg]+2, "exec")) execstr = argv[++arg];
             else {
                 fprintf(stderr, "unknown long option `%s'\n", argv[arg]);
                 return 1;
@@ -63,17 +76,28 @@ int main(int argc, char **argv) {
             case 'v':
                 version = 1;
                 break;
+            case 'd':
+                debug = 1;
+                break;
+            case 'e':
+                if (opt[1]) execstr = opt + 1;
+                else execstr = argv[++arg];
+                goto done;
             default:
                 fprintf(stderr, "unknown short option `-%c'\n", *opt);
                 return 1;
             }
         }
+        done: {}
     }
 
     if (help) {
-        printf("usage: %s FILENAME [ARGS]...\n"
+        printf("usage: %s [OPTS]... FILE [ARGS]...\n"
                "       %s -h|--help\n"
-               "       %s -v|--version\n",
+               "       %s -v|--version\n"
+               "\n"
+               "  -d, --debug       enable debug output to stderr\n"
+               "  -e, --exec CODE   execute code given as argument (don't specify FILE)\n",
                argv[0], argv[0], argv[0]);
         return 0;
     }
@@ -84,42 +108,50 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    if (!fp) {
-        fprintf(stderr, "usage: %s FILENAME [ARGS]...\n"
-                        "see `%s --help' or `man face' for more information\n",
-                        argv[0], argv[0]);
+    if (!!fp == !!execstr) {
+        usage(argv[0]);
         return 1;
     }
 
-    // read file into memory
-    size_t len = 0, read;
-    char *data = NULL, *newdata;
-    do {
-        if (!(newdata = realloc(data, len += BUF_SIZE))) {
-            fprintf(stderr, "call to realloc() failed - out of memory?\n");
+    char *data;
+    size_t datalen;
+    if (fp) {
+        // read file into memory
+        size_t len = 0, read;
+        char *newdata;
+        do {
+            if (!(newdata = realloc(data, len += BUF_SIZE))) {
+                fprintf(stderr, "call to realloc() failed - out of memory?\n");
+                free(data);
+                fclose(fp);
+                return 1;
+            }
+            data = newdata;
+        } while ((read = fread(data + len - BUF_SIZE, 1, BUF_SIZE, fp)) == BUF_SIZE);
+
+        // check for errors
+        if (ferror(fp)) {
+            fprintf(stderr, "error while reading file %s\n", argv[1]);
+            free(data);
+            fclose(fp);
+            return 1;
+        } else if (!feof(fp)) {
+            fprintf(stderr, "something weird happened, giving up\n");
             free(data);
             fclose(fp);
             return 1;
         }
-        data = newdata;
-    } while ((read = fread(data + len - BUF_SIZE, 1, BUF_SIZE, fp)) == BUF_SIZE);
+        fclose(fp);
 
-    // check for errors
-    if (ferror(fp)) {
-        fprintf(stderr, "error while reading file %s\n", argv[1]);
-        free(data);
-        fclose(fp);
-        return 1;
-    } else if (!feof(fp)) {
-        fprintf(stderr, "something weird happened, giving up\n");
-        free(data);
-        fclose(fp);
-        return 1;
+        datalen = len - BUF_SIZE + read;
+    } else {
+        datalen = strlen(execstr);
+        data = malloc((datalen + 1) * sizeof *data);
+        strcpy(data, execstr);
     }
-    fclose(fp);
 
     // run the input file and arguments as face code
-    face_run(data, len - BUF_SIZE + read, argc - 2, argv + 2);
+    face_run(data, datalen, argc - (arg+1), argv + (arg+1), debug);
 
     // cleanup
     free(data);
