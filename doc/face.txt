@@ -31,7 +31,7 @@ can be one of the following:
   f  float
   d  double
   e  long double
-Lowercase letters are used for signed types, and uppercase for unsigned.  (Both
+Lowercase letters are used for unsigned types, and uppercase for signed.  (Both
 work for floats and doubles, but there is no functional difference.)
 
 There is another quasi-number-mode, pointer mode (p).  This mode only exists to
