@@ -1,19 +1,380 @@
-.TH FACE 1 2018-01-01
+.TH FACE 1 2018-01-05
 .SH NAME
 face \- fairly awful c-based esolang
 .SH SYNOPSIS
 .B face
-\fIFILENAME\fR \
+[\fIOPTS\fR]... \
+\fIFILENAME\fR
 [\fIARGS\fR]...
 .SH DESCRIPTION
 .B face
 is an esoteric programming language
 written in and based on C.
-The motivation for its creation was
-that I wanted an esolang that makes you allocate your own memory.
-Furthermore, every variable is stored as a pointer.
+Its name stands for "fairly awful c-based esolang".
+In the true style of C,
+everything is a pointer
+and you have to allocate your own memory.
 .PP
-For detailed information, see \fBdoc/face.txt\fR.
+Code is parsed linearly,
+and each function has fixed arity.
+When a function is encountered,
+the next n bytes are treated as variables
+(variable names can be any printable ASCII)
+and passed to the function.
+.PP
+The unary operators
+.B !~
+and binary operators
+.B +-*/%&|^<>
+are supported,
+and they do the same thing they do in C.
+In addition,
+.B =
+corresponds to C's
+.BR == .
+They take one more argument than they traditionally do in C;
+for example,
+.B +abc
+roughly corresponds to
+.nf
+.RS
+*a = *b + *c
+.RE
+.fi
+in C, and similarly
+.B !de
+is used for
+.nf
+.RS
+*d = !*e
+.RE
+.fi
+The % operator is patched to use the fmod* family of functions for floats.
+.PP
+At every point in a face program,
+a global "number mode" exists
+that dictates how variables are dereferenced.
+This defaults to signed integer
+(the
+.B int
+type in C).
+In this mode,
+.B +abc
+is really interpreted as
+.nf
+.RS
+*(int*)a = *(int*)b + *(int*)c
+.RE
+.fi
+as internally all variables are stored as
+.BR void* .
+However, if the number mode is set to, say,
+.BR unsigned\ long ,
+then the same face code
+.B +abc
+is interpreted as
+.nf
+.RS
+*(unsigned long*)a = *(unsigned long*)b + *(unsigned long*)c
+.RE
+.fi
+The number mode can be changed with the
+.B ,
+command followed by a letter,
+which can be one of the following:
+.nf
+.RS
+c  char
+s  short
+i  int
+l  long
+m  long long
+f  float
+d  double
+e  long double
+.RE
+.fi
+Lowercase letters are used for unsigned types,
+and uppercase for signed.
+(Both work for
+.BR float s
+and
+.BR double s,
+but there is no functional difference.)
+.PP
+There is another quasi-number-mode, pointer mode (\fBp\fR).
+This mode only exists to work with pointers to pointers,
+such as that returned by the
+.B Av
+(argv) command.
+DO NOT use any operators,
+make any assignments,
+or execute any command
+that involves the value of a variable
+while in pointer mode!
+Bad Things will happen,
+as the only defined operations while in pointer mode are
+.B malloc
+and friends and the pointer manipulation commands
+.B $'`"_
+(described below).
+.PP
+Flow control in face is done entirely via jumps.
+Labels are indicated with
+.B :x
+where
+.B x
+can be any ASCII character,
+and jumps can be unconditional or conditional.
+An unconditional jump
+(corresponds to
+.B goto
+in C)
+is done with
+.B .x
+and a conditional jump with
+.B ?cx
+(c is the condition,
+and the jump will be executed iff its dereferenced value is not zero).
+
+face supports a primitive form of self-modification or introspection.
+The
+.B \\\\
+command takes two arguments
+and assigns a pointer to the beginning of the source code to the first
+and a pointer to the instruction pointer to the second.
+The instruction pointer is, in fact, not a pointer,
+but simply an integer representing the index in the source code
+of the command being evaluated.
+.B \\\\
+can be used to access strings stored in the source code,
+which can be skipped by either jumps
+or by modifying the instruction pointer.
+.PP
+Amusingly, the
+.B \\\\
+command is effectively required for any nontrivial program!
+This is true because
+.B malloc
+and
+.B calloc
+require an argument specifying how much memory to allocate,
+but all arguments are passed as pointers in face,
+running into a sort of circular logic.
+However, one can use the values of the pointers returned from the
+.B \\\\
+command as arguments to
+.B malloc
+to circumvent this issue.
+.PP
+To facilitate the use of
+.B \\\\
+to access embedded strings, all
+.B @
+characters are replaced with null bytes in a preprocessing stage.
+In order to allow the use of actual
+.B @
+characters, the
+.B #
+symbol acts as an escape character (so,
+.B #@
+is a literal
+.BR @ ,
+and
+.B ##
+is a literal
+.BR # ).
+Additionally,
+.B #
+followed by an uppercase letter or
+.B ?[\\\\]^
+is converted to its corresponding unprintable character
+by XORing with
+.BR 0x40 ,
+a la caret notation.
+
+The only proper "assignment" operators
+(aside from pointer assignment)
+are the digits
+.B 0
+through
+.BR 9 .
+These act as unary functions that take a pointer as an argument;
+for example,
+.B 6a
+corresponds to the C code
+.BR *a\ =\ 6 .
+Pointer assignment is binary and uses the
+.B $
+operator; e.g.
+.B $ab
+assigns the pointer value of
+.B b
+to
+.B a
+(\fBa = b\fR in C, where
+.B a
+and
+.B b
+are pointers).
+.PP
+There are also four other pointer manipulation commands.
+The
+.B '
+command increments a pointer (\fB'a\fR is \fBa++\fR)
+and the
+.B `
+command decrements a pointer (\fB`a\fR is \fBa--\fR).
+The
+.B """
+command shifts a pointer by a given amount (\fB"ab\fR is \fBa += *b\fR);
+note that the second argument
+is always dereferenced as a signed integer
+regardless of number mode!
+Finally, the unary
+.B _
+command "rewinds" or resets a pointer to its original value;
+that is, the value it had before any
+.B '`"
+operations were performed on it.
+.PP
+Comments are expressed with the notation
+.B ( ... )
+-- that is, when a
+.B (
+symbol is encountered in parsing,
+everything until the following
+.B )
+is ignored.
+Additionally, if a
+.B q
+is encountered as a command while parsing,
+the program is immediately terminated.
+.PP
+Lowercase letters typically represent standard library functions.
+The following are currently available:
+.PP
+.nf
+.RS
+c   a = calloc((size_t)*b, sizeof nummode)
+e   a = stderr
+i   a = stdin
+m   a = malloc((size_t)*b * sizeof nummode)
+o   a = stdout
+p   *a = sprintf(b, c, ...)
+r   *a = fread(b, 1, (size_t)*c, d)
+s   *a = sscanf(b, c, ...)
+w   *a = fwrite(b, 1, (size_t)*c, d)
+.RE
+.fi
+.PP
+As a special case, the
+.B m
+function will call
+.B realloc
+if its first argument is the last reference to a given pointer
+(and
+.B c
+will call
+.B free
+in the same case),
+thus eliminating the need to manually free memory.
+The commands
+.BR @ ,
+.BR \\\\\\ ,
+and
+.B p
+also have this auto-freeing behavior.
+(Consider this the one concession to usability that face provides.)
+.PP
+Variadic functions are called by specifying a type
+(\fBcCsSiIlLmMfFdDeEpP\fR)
+followed by a variable name any number of times.
+The argument list is terminated
+when the following character is not part of this set.
+For example,
+.nf
+.RS
+n = sprintf(s, "%d %f\\n", x, y)
+.RE
+.fi
+would roughly translate to
+.BR pns%ixdy ,
+assuming the format string is stored in
+.BR % .
+.PP
+Also note that the
+.BR p / sprintf
+function has special behavior
+that automatically allocates the right amount of memory
+for the string being printed into,
+making it somewhat like the nonstandard GNU
+.BR asprintf() .
+.PP
+Uppercase letters are typically collections of related functions:
+.PP
+.nf
+.RS
+Ac   *a = argc
+Av   a = argv
+
+M(   *a = ceil(*b)
+MC   *a = acos(*b)
+MM   *a = max(*b, *c);
+MS   *a = asin(*b)
+MT   *a = atan(*b)
+M^   *a = pow(*b * *c)
+Ma   *a = abs(*b)
+Mc   *a = cos(*b)
+Me   *a = exp(*b)
+Mf   *a = floor(*b)
+Ml   *a = log(*b)
+Mm   *a = min(*b, *c);
+Mp   *a = M_PI
+Mr   *a = round(*b)
+Ms   *a = sin(*b)
+Mt   *a = tan(*b)
+
+Rm   *a = RAND_MAX
+Rr   *a = rand()
+Rs   srand(*a)
+
+Sc   *a = strcmp(b, c)
+Sl   *a = strlen(b)
+.RE
+.fi
+.PP
+The math functions that have
+.BR X ,
+.BR Xf ,
+and
+.B Xl
+variants use the appropriate one in floating point nummodes
+and fallback to the
+.BR X \ ( double )
+version otherwise.
+The
+.B abs
+function uses the appropriate function from
+.BR abs ,
+.BR labs ,
+.BR llabs ,
+.BR fabs ,
+.BR fabsf ,
+and
+.BR fabsl ,
+falling back to
+.B abs
+for
+.BR char s
+and
+.BR short s.
+.B max
+and
+.B min
+use the appropriate
+.BR fmax / fmin
+function for floats and a custom implementation for ints.
 .SH BUGS
 Many.
 What did you expect?

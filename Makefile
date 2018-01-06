@@ -35,3 +35,8 @@ clean:
 
 test: $(TARGET)
 	tests/test.sh
+
+doc/$(NAME).txt: ./$(NAME).1
+	echo === NOTE: this file was automatically generated from the file $< === > $@
+	echo >> $@
+	MANWIDTH=80 man ./$< | col -bx >> $@

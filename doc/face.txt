@@ -1,152 +1,183 @@
-face stands for "fairly awful c-based esolang".  In the true style of C,
-everything is a pointer and you have to allocate your own memory.
+=== NOTE: this file was automatically generated from the file face.1 ===
 
-Code is parsed linearly, and each function has fixed arity.  When a function is
-encountered, the next n bytes are treated as variables (variable names can be
-any printable ASCII) and passed to the function.
+FACE(1)                     General Commands Manual                    FACE(1)
 
-The unary operators !~ and binary operators +-*/%&|^<> are supported, and they
-do the same thing they do in C.  In addition, = corresponds to C's ==.  They
-take one more argument than they traditionally do in C; for example, +abc
-roughly corresponds to
-  *a = *b + *c
-in C, and similarly !de is used for
-  *d = !*e
-The % operator is patched to use the fmod* family of functions for floats.
+NAME
+       face - fairly awful c-based esolang
 
-At every point in a face program, a global "number mode" exists that dictates
-how variables are dereferenced.  This defaults to signed integer (the int type
-in C).  In this mode, +abc is really interpreted as
-  *(int*)a = *(int*)b + *(int*)c
-as internally all variables are stored as void*.  However, if the number mode
-is set to, say, unsigned long, then the same face code +abc is interpreted as
-  *(unsigned long*)a = *(unsigned long*)b + *(unsigned long*)c
-The number mode can be changed with the , command followed by a letter, which
-can be one of the following:
-  c  char
-  s  short
-  i  int
-  l  long
-  m  long long
-  f  float
-  d  double
-  e  long double
-Lowercase letters are used for unsigned types, and uppercase for signed.  (Both
-work for floats and doubles, but there is no functional difference.)
+SYNOPSIS
+       face [OPTS]... FILENAME [ARGS]...
 
-There is another quasi-number-mode, pointer mode (p).  This mode only exists to
-work with pointers to pointers, such as that returned by the Av (argv) command.
-DO NOT use any operators, make any assignments, or execute any command that
-involves the value of a variable while in pointer mode!  Bad Things will
-happen, as the only defined operations while in pointer mode are malloc and
-friends and the pointer manipulation commands $'`"_ (described below).
+DESCRIPTION
+       face  is  an  esoteric  programming language written in and based on C.
+       Its name stands for "fairly awful c-based esolang".  In the true  style
+       of C, everything is a pointer and you have to allocate your own memory.
 
-Flow control in face is done entirely via jumps.  Labels are indicated with :x
-where x can be any ASCII character, and jumps can be unconditional or
-conditional.  An unconditional jump (corresponds to goto in C) is done with .x
-and a conditional jump with ?cx (c is the condition, and the jump will be
-executed iff its dereferenced value is not zero).
+       Code  is  parsed  linearly,  and each function has fixed arity.  When a
+       function is encountered, the next n  bytes  are  treated  as  variables
+       (variable names can be any printable ASCII) and passed to the function.
 
-face supports a primitive form of self-modification or introspection.  The \
-command takes two arguments and assigns a pointer to the beginning of the
-source code to the first and a pointer to the instruction pointer to the
-second.  The instruction pointer is, in fact, not a pointer, but simply an
-integer representing the index in the source code of the command being
-evaluated.  \ can be used to access strings stored in the source code, which
-can be skipped by either jumps or by modifying the instruction pointer.
+       The  unary  operators !~ and binary operators +-*/%&|^<> are supported,
+       and they do the same thing they do in C.  In addition, = corresponds to
+       C's  ==.   They take one more argument than they traditionally do in C;
+       for example, +abc roughly corresponds to
+              *a = *b + *c
+       in C, and similarly !de is used for
+              *d = !*e
+       The % operator is patched to use the  fmod*  family  of  functions  for
+       floats.
 
-Amusingly, the \ command is effectively required for any nontrivial program!
-This is true because malloc and calloc require an argument specifying how much
-memory to allocate, but all arguments are passed as pointers in face, running
-into a sort of circular logic.  However, one can use the values of the pointers
-returned from the \ command as arguments to malloc to circumvent this issue.
+       At  every  point  in a face program, a global "number mode" exists that
+       dictates how variables are dereferenced.  This defaults to signed inte‐
+       ger (the int type in C).  In this mode, +abc is really interpreted as
+              *(int*)a = *(int*)b + *(int*)c
+       as  internally all variables are stored as void*.  However, if the num‐
+       ber mode is set to, say, unsigned long, then the same face code +abc is
+       interpreted as
+              *(unsigned long*)a = *(unsigned long*)b + *(unsigned long*)c
+       The number mode can be changed with the , command followed by a letter,
+       which can be one of the following:
+              c  char
+              s  short
+              i  int
+              l  long
+              m  long long
+              f  float
+              d  double
+              e  long double
+       Lowercase letters are  used  for  unsigned  types,  and  uppercase  for
+       signed.   (Both work for floats and doubles, but there is no functional
+       difference.)
 
-To facilitate the use of \ to access embedded strings, all @ characters are
-replaced with null bytes in a preprocessing stage.  In order to allow the use
-of actual @ characters, the # symbol acts as an escape character (so, #@ is a
-literal @, and ## is a literal #).  Additionally, # followed by an uppercase
-letter or ?[\]^ is converted to its corresponding unprintable character by
-XORing with 0x40, a la caret notation.
+       There is another quasi-number-mode, pointer mode (p).  This  mode  only
+       exists  to work with pointers to pointers, such as that returned by the
+       Av (argv) command.  DO NOT use any operators, make any assignments,  or
+       execute  any  command  that  involves  the value of a variable while in
+       pointer mode!  Bad Things will happen, as the only  defined  operations
+       while  in pointer mode are malloc and friends and the pointer manipula‐
+       tion commands $'`"_ (described below).
 
-The only proper "assignment" operators (aside from pointer assignment) are the
-digits 0 through 9.  These act as unary functions that take a pointer as an
-argument; for example, 6a corresponds to the C code *a = 6.  Pointer assignment
-is binary and uses the $ operator; e.g. $ab assigns the pointer value of b to a
-(a = b in C, where a and b are pointers).
+       Flow control in face is done entirely via jumps.  Labels are  indicated
+       with  :x  where x can be any ASCII character, and jumps can be uncondi‐
+       tional or conditional.  An unconditional jump (corresponds to  goto  in
+       C) is done with .x and a conditional jump with ?cx (c is the condition,
+       and the jump will be executed iff its dereferenced value is not zero).
 
-There are also four other pointer manipulation commands.  The ' command
-increments a pointer ('a is a++) and the ` command decrements a pointer (`a is
-a--).  The " command shifts a pointer by a given amount ("ab is a += *b); note
-that the second argument is always dereferenced as a signed integer regardless
-of number mode!  Finally, the unary _ command "rewinds" or resets a pointer to
-its original value; that is, the value it had before any '`" operations were
-performed on it.
+       face supports a primitive form of self-modification  or  introspection.
+       The  \  command takes two arguments and assigns a pointer to the begin‐
+       ning of the source code to the first and a pointer to  the  instruction
+       pointer  to  the  second.   The  instruction pointer is, in fact, not a
+       pointer, but simply an integer representing the  index  in  the  source
+       code  of  the command being evaluated.  \ can be used to access strings
+       stored in the source code, which can be skipped by either jumps  or  by
+       modifying the instruction pointer.
 
-Comments are expressed with the notation ( ... ) -- that is, when a ( symbol is
-encountered in parsing, everything until the following ) is ignored.
-Additionally, if a q is encountered as a command while parsing, the program is
-immediately terminated.
+       Amusingly,  the  \  command  is effectively required for any nontrivial
+       program!  This is true because malloc and calloc  require  an  argument
+       specifying how much memory to allocate, but all arguments are passed as
+       pointers in face, running into a sort of circular logic.  However,  one
+       can use the values of the pointers returned from the \ command as argu‐
+       ments to malloc to circumvent this issue.
 
-Lowercase letters typically represent standard library functions.  The
-following are currently available:
+       To facilitate the use of \ to access embedded strings, all @ characters
+       are  replaced  with  null  bytes in a preprocessing stage.  In order to
+       allow the use of actual @ characters, the # symbol acts  as  an  escape
+       character  (so,  #@  is a literal @, and ## is a literal #).  Addition‐
+       ally, # followed by an uppercase letter or ?[\]^ is  converted  to  its
+       corresponding  unprintable  character  by  XORing with 0x40, a la caret
+       notation.
 
-  c   a = calloc((size_t)*b, sizeof nummode)
-  e   a = stderr
-  i   a = stdin
-  m   a = malloc((size_t)*b * sizeof nummode)
-  o   a = stdout
-  p   *a = sprintf(b, c, ...)
-  r   *a = fread(b, 1, (size_t)*c, d)
-  s   *a = sscanf(b, c, ...)
-  w   *a = fwrite(b, 1, (size_t)*c, d)
+       The only proper "assignment" operators (aside from pointer  assignment)
+       are  the  digits 0 through 9.  These act as unary functions that take a
+       pointer as an argument; for example,  6a  corresponds  to  the  C  code
+       *a = 6.   Pointer  assignment  is  binary and uses the $ operator; e.g.
+       $ab assigns the pointer value of b to a (a = b in C, where a and b  are
+       pointers).
 
-As a special case, the m function will call realloc if its first argument is
-the last reference to a given pointer (and c will call free in the same case),
-thus eliminating the need to manually free memory.  The commands @, \, and p
-also have this auto-freeing behavior.  (Consider this the one concession to
-usability that face provides.)
+       There are also four other pointer manipulation commands.  The ' command
+       increments a pointer ('a is a++) and the ` command decrements a pointer
+       (`a  is a--).  The " command shifts a pointer by a given amount ("ab is
+       a += *b); note that the second argument is  always  dereferenced  as  a
+       signed integer regardless of number mode!  Finally, the unary _ command
+       "rewinds" or resets a pointer to its original value; that is, the value
+       it had before any '`" operations were performed on it.
 
-Variadic functions are called by specifying a type (cCsSiIlLmMfFdDeEpP, where p
-is any pointer) followed by a variable name any number of times.  The argument
-list is terminated when the following character is not part of this set.  For
-example, n = sprintf(s, "%d %f\n", x, y) would roughly translate to pns%ixdy,
-assuming the format string is stored in %.
+       Comments  are  expressed with the notation ( ... ) -- that is, when a (
+       symbol is encountered in parsing, everything until the following  )  is
+       ignored.   Additionally, if a q is encountered as a command while pars‐
+       ing, the program is immediately terminated.
 
-Also note that the p/sprintf function has special behavior that automatically
-allocates the right amount of memory for the string being printed into, making
-it somewhat like the nonstandard GNU asprintf().
+       Lowercase letters typically represent standard library functions.   The
+       following are currently available:
 
-Uppercase letters are typically collections of related functions:
+              c   a = calloc((size_t)*b, sizeof nummode)
+              e   a = stderr
+              i   a = stdin
+              m   a = malloc((size_t)*b * sizeof nummode)
+              o   a = stdout
+              p   *a = sprintf(b, c, ...)
+              r   *a = fread(b, 1, (size_t)*c, d)
+              s   *a = sscanf(b, c, ...)
+              w   *a = fwrite(b, 1, (size_t)*c, d)
 
-  Ac   *a = argc
-  Av   a = argv
+       As  a special case, the m function will call realloc if its first argu‐
+       ment is the last reference to a given pointer (and c will call free  in
+       the same case), thus eliminating the need to manually free memory.  The
+       commands @, \, and p also have this auto-freeing  behavior.   (Consider
+       this the one concession to usability that face provides.)
 
-  M(   *a = ceil(*b)
-  MC   *a = acos(*b)
-  MM   *a = max(*b, *c);
-  MS   *a = asin(*b)
-  MT   *a = atan(*b)
-  M^   *a = pow(*b * *c)
-  Ma   *a = abs(*b)
-  Mc   *a = cos(*b)
-  Me   *a = exp(*b)
-  Mf   *a = floor(*b)
-  Ml   *a = log(*b)
-  Mm   *a = min(*b, *c);
-  Mp   *a = M_PI
-  Mr   *a = round(*b)
-  Ms   *a = sin(*b)
-  Mt   *a = tan(*b)
+       Variadic functions are called by specifying a type (cCsSiIlLmMfFdDeEpP)
+       followed by a variable name any number of times.  The argument list  is
+       terminated  when  the following character is not part of this set.  For
+       example,
+              n = sprintf(s, "%d %f\n", x, y)
+       would roughly translate to pns%ixdy,  assuming  the  format  string  is
+       stored in %.
 
-  Rm   *a = RAND_MAX
-  Rr   *a = rand()
-  Rs   srand(*a)
+       Also  note  that the p/sprintf function has special behavior that auto‐
+       matically allocates the right amount of memory  for  the  string  being
+       printed into, making it somewhat like the nonstandard GNU asprintf().
 
-  Sc   *a = strcmp(b, c)
-  Sl   *a = strlen(b)
+       Uppercase letters are typically collections of related functions:
 
-The math functions that have X, Xf, and Xl variants use the appropriate one in
-floating point nummodes and fallback to the X (double) version otherwise.  The
-abs function uses the appropriate function from abs, labs, llabs, fabs, fabsf,
-and fabsl, falling back to abs for chars and shorts.  max and min use the
-appropriate fmax/fmin function for floats and a custom implementation for ints.
+              Ac   *a = argc
+              Av   a = argv
+
+              M(   *a = ceil(*b)
+              MC   *a = acos(*b)
+              MM   *a = max(*b, *c);
+              MS   *a = asin(*b)
+              MT   *a = atan(*b)
+              M^   *a = pow(*b * *c)
+              Ma   *a = abs(*b)
+              Mc   *a = cos(*b)
+              Me   *a = exp(*b)
+              Mf   *a = floor(*b)
+              Ml   *a = log(*b)
+              Mm   *a = min(*b, *c);
+              Mp   *a = M_PI
+              Mr   *a = round(*b)
+              Ms   *a = sin(*b)
+              Mt   *a = tan(*b)
+
+              Rm   *a = RAND_MAX
+              Rr   *a = rand()
+              Rs   srand(*a)
+
+              Sc   *a = strcmp(b, c)
+              Sl   *a = strlen(b)
+
+       The math functions that have X, Xf, and Xl variants use the appropriate
+       one in floating point nummodes and fallback to the  X (double)  version
+       otherwise.   The  abs  function uses the appropriate function from abs,
+       labs, llabs, fabs, fabsf, and fabsl, falling back to abs for chars  and
+       shorts.   max and min use the appropriate fmax/fmin function for floats
+       and a custom implementation for ints.
+
+BUGS
+       Many.  What did you expect?
+
+AUTHOR
+       KeyboardFire <andy@keyboardfire.com>
+
+                                  2018-01-05                           FACE(1)
