@@ -98,6 +98,25 @@ fun edge case
     !bin/face -e '\$*mn*3no>Av@[%@"%n$^%{^`^`%`%wn%n>wn^n>_%_^wn%n>wn^n>' -- foo bar baz quux
         barbazfooquu
 
+*** test introspection ***
+
+    \$*7*.A.B:Ao>mn*3nwn$n>:Bo>mn*5nwn$n>
+        \$*7*
+    \$*0*
+        *timeout*
+    \$*o>mn*3nwn$n>****wn$n>
+        \$*
+    \$*mx*o>5xwx$x>my*9y*yyy-xxy***x3xwx$x>
+        \$*mx
+    \$*m;*6;*;;;,c"$;-$$$+$$;o>        .X :X3;.z:$5;.z :zw;$;>
+        $ :X3
+    \$*,cm.*3.+$$.o>w.$.>
+        _$*
+    (%s)\$*,cm.*3."$.-$$$_$p.&$p$o>w.&.>
+        ((%s
+    \$*m;*5;*;;;,c"$;-$$$      o>5;_$w;$;>
+        \$*m;
+
 *** tests from the examples directory ***
 
     !bin/face examples/args.face foo bar baz
