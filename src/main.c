@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    char *data;
+    char *data = 0;
     size_t datalen;
     if (fp) {
         // read file into memory
