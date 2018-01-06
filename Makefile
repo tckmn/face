@@ -39,4 +39,4 @@ test: $(TARGET)
 doc/$(NAME).txt: ./$(NAME).1
 	echo === NOTE: this file was automatically generated from the file $< === > $@
 	echo >> $@
-	MANWIDTH=80 man ./$< | col -bx >> $@
+	MANWIDTH=80 man --nj ./$< | col -bx >> $@
