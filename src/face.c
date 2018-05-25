@@ -22,6 +22,11 @@
 #include <string.h>
 
 #include <ffi.h>
+#ifdef __GNUC__
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+#endif
 
 #include "face.h"
 
