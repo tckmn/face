@@ -11,7 +11,7 @@ all: $(TARGET)
 
 bin/%.o: src/%.c $(wildcard src/*.h)
 	@mkdir -p bin
-	$(CC) $(FLAGS) -std=c99 -Wall -Wextra -Wpedantic -Werror -c $< -o $@ $(SEARCH)
+	$(CC) $(FLAGS) -std=c99 -Wall -Wextra -Wpedantic -Werror -Wno-cast-function-type -c $< -o $@ $(SEARCH)
 
 $(TARGET): $(patsubst src/%.c, bin/%.o, $(wildcard src/*.c))
 	@mkdir -p bin
