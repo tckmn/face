@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include <ffi.h>
-#ifdef __GNUC__
+#if __GNUC__ >= 8
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
